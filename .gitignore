@@ -1,0 +1,11 @@
+# Compiled source
+*.pyc
+*.pyo
+
+# Backups and logs
+*.save*
+*.bak
+*.log
+*/old/*
+*.swp
+

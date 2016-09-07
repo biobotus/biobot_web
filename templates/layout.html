@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Title -->
+        <title>BioBot - {% block title %}Web App{% endblock title %}</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+        <!-- BioBot Icon -->
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+        {% block includes %}
+            <!-- Bootstrap CSS files -->
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.css') }}">
+
+            <!-- Custom CSS -->
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/simple-sidebar.css') }}">
+
+            <!-- Bootstrap JavaScript files -->
+            <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+
+            <!-- Custom JS -->
+            <script src="{{ url_for('static', filename='js/sidebar_menu.js') }}"></script>
+
+        {% endblock includes %}
+
+    </head>
+
+    <body style="padding-bottom: 50px;">
+        <nav class="navbar navbar-default no-margin">
+        <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header fixed-brand">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" id="menu-toggle">
+                    <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
+                </button>
+                <a class="navbar-brand" href="/"><p><img src="{{ url_for('static', filename='img/logo_biobot_only.png') }}" alt="Logo BioBot" height="40" width="16"> <span style="color:#B22222; font-weight: bold;">BioBot</span> Web App</p></a>
+            </div><!-- navbar-header-->
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><button class="navbar-toggle collapse in" data-toggle="collapse" id="menu-toggle-2"> <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span></button></li>
+                </ul>
+            </div><!-- bs-example-navbar-collapse-1 -->
+        </nav>
+
+        <div id="wrapper">
+            <!-- Sidebar -->
+            <div id="sidebar-wrapper">
+                <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
+                    {{ format_sidebar('Home', 'home') }}
+                    {{ format_sidebar('Surveillance', 'facetime-video') }}
+                    {{ format_sidebar('Manual Control', 'dashboard') }}
+                    {{ format_sidebar('Mapping', 'globe') }}
+                    {{ format_sidebar('Biological Protocol', 'tint') }}
+                    {{ format_sidebar('Image Analysis', 'picture') }}
+                    {{ format_sidebar('Log', 'search') }}
+                </ul>
+            </div><!-- /#sidebar-wrapper -->
+
+            <div id="page-content-wrapper">
+                <div class="container-fluid xyz">
+                    <!-- Page Content -->
+                    {% block content %}{% endblock %}
+
+                    <!-- Footer -->
+                    {% block footer %}
+                        <nav id="footer" class="navbar navbar-default navbar-fixed-bottom">
+                            <div class="container">
+                                <a href="https://github.com/biobotus" class="navbar-btn btn-danger btn pull-left"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> BioBot Open Platform Project - 2016</a>
+                            </div>
+                        </nav>
+                    {% endblock footer %}
+                </div>
+            </div>
+            <!-- /#page-content-wrapper -->
+        </div>
+    </body>
+</html>
+

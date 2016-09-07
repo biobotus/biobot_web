@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block includes %}
+    {{ super() }}
+
+    <!-- DataTables CSS files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dataTables.bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/buttons.bootstrap.css') }}">
+
+    <!-- DataTables JavaScript files -->
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTables.bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dataTables.buttons.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/buttons.bootstrap.js') }}"></script>
+{% endblock includes %}
