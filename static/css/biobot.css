@@ -1,0 +1,17 @@
+button.eStop {
+    border: none;
+    height: 111px;
+    width: 111px;
+    background-color: transparent;
+    background-image: url('../img/e-stop.png');
+    outline: none;
+}
+
+button.eStop:hover {
+    cursor: pointer;
+    background-image: url('../img/e-stop-hover.png');
+}
+
+.full-width {
+    display:block;
+}

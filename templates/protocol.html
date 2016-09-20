@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}Biological Protocol{% endblock title %}
+
+{% block includes %}
+    {{ super() }}
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/protocol.css') }}">
+
+    <script src="{{ url_for('static', filename='js/FileSaver.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/protocol.js') }}"></script>
+{% endblock includes %}
+
+{% block content %}
+    <table>
+        <td valign="top" style="min-width:400px">
+            <div class="btn-group" id="deck-buttons">
+                <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Deck Options <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li onclick="clear_deck()"><a href="#">Clear</a></li>
+                    <li onclick="load_default_deck()"><a href="#">Load default</a></li>
+                    <li><a href="#" class="btn-file">Open file<input type="file" id="open-deck" accept=".txt"></a></li>
+                    <li onclick="save_deck()"><a href="#">Save file</a></li>
+                    <li onclick="send_deck_to_planner()"><a href="#">Send to Planner</a></li>
+                </ul>
+            </div>
+            <p id="deck-warning" style="color:red;"></p>
+            <div>
+                <textarea id="deck" cols="50" rows="30"></textarea>
+            </div>
+        </td>
+        <td valign="top" style="min-width:400px">
+            <div class="btn-group" id="protocol-buttons">
+                <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Protocol Options <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li onclick="clear_protocol()"><a href="#">Clear</a></li>
+                    <li onclick="load_default_protocol()"><a href="#">Load default</a></li>
+                    <li><a href="#" class="btn-file">Open file<input type="file" id="open-protocol" accept=".json"></a></li>
+                    <li onclick="save_protocol()"><a href="#">Save file</a></li>
+                    <li onclick="send_protocol_to_planner()"><a href="#">Send to Planner</a></li>
+                </ul>
+            </div>
+            <p id="protocol-warning" style="color:red;"></p>
+            <div>
+                <textarea id="protocol" cols="50" rows="30"></textarea>
+            </div>
+        </td>
+    </table>
+{% endblock content %}
