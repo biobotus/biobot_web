@@ -32,10 +32,9 @@ $(document).ready(function() {initMenu();});
 
 function setHeightSidebar() {
     // Adjust height of sidebar-wrapper
-    var body = document.body, html = document.documentElement;
     var menu_height = document.getElementById("menu").offsetHeight;
     var footer_height = document.getElementById("footer").offsetHeight;
-    var height = Math.max(html.clientHeight, html.scrollHeight);
+    var height = $(window).height();
     height -= document.getElementById("bs-example-navbar-collapse-1").offsetHeight;
     height -= document.getElementById("footer").offsetHeight;
     document.getElementById("sidebar-wrapper").style.height = Math.max(height, menu_height+footer_height) + "px"

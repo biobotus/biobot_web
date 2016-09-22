@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <!-- Title -->
+        {# Title #}
         <title>BioBot - {% block title %}Web App{% endblock title %}</title>
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-        <!-- BioBot Icon -->
+        {# BioBot Icon #}
         <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 
         {% block includes %}
-            <!-- Bootstrap CSS files -->
+            {# Bootstrap CSS files #}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.css') }}">
 
-            <!-- Custom CSS -->
+            {# Custom CSS #}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/simple-sidebar.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/biobot.css') }}">
 
-            <!-- Bootstrap JavaScript files -->
+            {# Bootstrap JavaScript files #}
             <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
             <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
 
-            <!-- Custom JS -->
+            {# Custom JS #}
             <script src="{{ url_for('static', filename='js/sidebar_menu.js') }}"></script>
             <script src="{{ url_for('static', filename='js/eventemitter2.js') }}"></script>
             <script src="{{ url_for('static', filename='js/roslib.js') }}"></script>
@@ -35,23 +35,23 @@
 
     <body style="padding-bottom: 125px;">
         <nav class="navbar navbar-default no-margin">
-        <!-- Brand and toggle get grouped for better mobile display -->
+        {# Brand and toggle get grouped for better mobile display #}
             <div class="navbar-header fixed-brand">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" id="menu-toggle">
                     <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span>
                 </button>
                 <a class="navbar-brand" href="/"><p><img src="{{ url_for('static', filename='img/logo_biobot_only.png') }}" alt="Logo BioBot" height="40" width="16"> <span style="color:#B22222; font-weight: bold;">BioBot</span> Web App</p></a>
-            </div><!-- navbar-header-->
+            </div> {# navbar-header#}
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li class="active"><button class="navbar-toggle collapse in" data-toggle="collapse" id="menu-toggle-2"> <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span></button></li>
                 </ul>
-            </div><!-- bs-navbar-collapse-1 -->
+            </div> {# bs-navbar-collapse-1 #}
         </nav>
 
         <div id="wrapper">
-            <!-- Sidebar -->
+            {# Sidebar #}
             <div id="sidebar-wrapper">
                 <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
                     {{ format_sidebar('Home', 'home') }}
@@ -62,14 +62,14 @@
                     {{ format_sidebar('Image Analysis', 'picture') }}
                     {{ format_sidebar('Log', 'search') }}
                 </ul>
-            </div><!-- sidebar-wrapper -->
+            </div> {# sidebar-wrapper #}
 
             <div id="page-content-wrapper">
                 <div class="container-fluid xyz">
-                    <!-- Page Content -->
+                    {# Page Content #}
                     {% block content %}{% endblock %}
 
-                    <!-- Footer -->
+                    {# Footer #}
                     <nav id="footer" class="navbar navbar-default navbar-fixed-bottom">
                         <table style="width:100%"><tr>
                             <td align=center style="width:150px; padding:5px">
@@ -84,7 +84,7 @@
                             </h3></td>
                             <td align=center style="padding:5px">
                                 {% block footer %}
-                                    <!-- Overwrite to display anything in the footer -->
+                                    {# Overwrite to display anything in the footer #}
                                 {% endblock footer %}
                             </td>
                             <td align=center style="width:400px; padding:5px">
@@ -94,7 +94,7 @@
                     </nav>
                 </div>
             </div>
-            <!-- page-content-wrapper -->
+            {# page-content-wrapper #}
         </div>
     </body>
 </html>

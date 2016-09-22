@@ -5,4 +5,4 @@
 cd "${0%/*}"
 
 # Send all arguments to Python script
-/usr/bin/python biobot_web.py $@
+/usr/bin/python3 biobot_web.py $@

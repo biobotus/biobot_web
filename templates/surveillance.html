@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
 
+{% block title %}Surveillance{% endblock title %}
+
 {% block includes %}
     {{ super() }}
     <script src="{{ url_for('static', filename='js/resize_img.js') }}"></script>
 {% endblock includes %}
 
 {% block content %}
-    <img class="img-responsive" id="resize-img" src="{{ url_for('static', filename='img/complete_logo_outer_alpha.png') }}" alt="Logo BioBot">
+    <img class="img-responsive img-rounded" id="resize-img" src="http://{{conf.webcam_host}}:{{conf.webcam_port}}/?action=stream" alt="Live BioBot Webcam">
 {% endblock content %}
 

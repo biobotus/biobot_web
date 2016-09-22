@@ -1,0 +1,7 @@
+{
+    "host": "0.0.0.0",
+    "port": "5000",
+    "debug": false,
+    "webcam_host": "10.43.156.11",
+    "webcam_port": "10088"
+}
