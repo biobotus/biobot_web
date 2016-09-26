@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{# This template subdivides 'content' block into four
+   sub-content blocks (top, left, right and bottom):
+
+   [    TOP     ]
+   [LEFT] [RIGHT]
+   [   BOTTOM   ]
+#}
+
+{% block content %}
+    <div class="container-fluid row" style="min-width:420px">
+        {% block content_top %}{% endblock %}
+    </div>
+    <div class="table-responsive" style="min-width:500px;overflow:visible">
+        <table>
+            <tr>
+                <td valign="top">
+                    <div class="container-fluid row" style="min-width:375px">
+                        {% block content_left %}{% endblock %}
+                    </div>
+                </td>
+                <td valign="top">
+                    <div class="container-fluid row" style="min-width:125px">
+                        {% block content_right %}{% endblock %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="container-fluid row">
+        {% block content_bottom %}{% endblock %}
+    </div>
+{% endblock content %}
+

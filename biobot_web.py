@@ -54,6 +54,10 @@ def home():
 def surveillance():
     return render_template('surveillance.html', conf=conf)
 
+@app.route('/control')
+def control():
+    return render_template('control.html')
+
 @app.route('/protocol')
 def protocol():
     return render_template('protocol.html')

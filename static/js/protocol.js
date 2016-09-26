@@ -50,7 +50,6 @@ function clear_deck() {
 }
 
 function clear_protocol() {
-    console.log($('#deck-buttons'));
     clear_protocol_warning()
     protocol.disabled = false
     protocol.value = ''

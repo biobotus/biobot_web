@@ -1,0 +1,179 @@
+{% extends "layout_control.html" %}
+
+{% block title %}Manual Control{% endblock title %}
+
+{% block includes %}
+    {{ super() }}
+
+    <script src="{{ url_for('static', filename='js/control.js') }}"></script>
+{% endblock includes %}
+
+{% block content_top %}
+    {# Top Navigation Bar #}
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <button type="button" id="show-axis-btn" class="btn btn-default navbar-btn active" onclick="show('axis')">Axis</button>
+                    <button type="button" id="show-sp-btn" class="btn btn-default navbar-btn" onclick="show('sp')">Single Pipette</button>
+                    <button type="button" id="show-mp-btn" class="btn btn-default navbar-btn" onclick="show('mp')">Multiple Pipette</button>
+                    <button type="button" id="show-gripper-btn" class="btn btn-default navbar-btn" onclick="show('gripper')">Gripper</button>
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock content_top %}
+
+{% block content_left %}
+    <div style="height:255px">
+        {# Axis Manual Control Tab #}
+        <div id="axis-control" style="display:block">
+            <h3>Axis Manual Control</h3>
+
+            {# Dropdown button for relative/absolute motion #}
+            <div class="btn-group">
+                <button type="button" id="axis_mode" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Relative Movement <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li onclick="select('axis_mode', 'Relative Movement')"><a href="#">Relative Movement</a></li>
+                    <li onclick="select('axis_mode', 'Absolute Position')"><a href="#">Absolute Position</a></li>
+                </ul>
+            </div>
+
+            <br><br>
+
+            {# User input fields #}
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">X</span>
+                <input type="text" id="input-x" class="form-control" placeholder="x mm">
+            </div>
+
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">Y</span>
+                <input type="text" id="input-y" class="form-control" placeholder="y mm">
+            </div>
+
+            <div class="input-group form-group" style="width:260px">
+                <div class="input-group-btn">
+                    <button type="button" id="z_mode" style="width:130px" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Simple Pipette <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li onclick="select('z_mode', 'Simple Pipette')"><a href="#">Simple Pipette</a></li>
+                        <li onclick="select('z_mode', 'Multiple Pipette')"><a href="#">Multiple Pipette</a></li>
+                        <li onclick="select('z_mode', 'Gripper')"><a href="#">Gripper</a></li>
+                    </ul>
+                </div>
+                <input type="text" id="input-z" class="form-control" placeholder="z mm">
+            </div>
+        </div>
+
+        {# Simple Pipette Manual Control Tab #}
+        <div id="sp-control" style="display:none">
+            <h3>Simple Pipette Manual Control</h3>
+
+            {# User input fields #}
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">Volume</span>
+                <input type="text" id="input-volume-sp" class="form-control" placeholder="&micro;L">
+            </div>
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">Speed</span>
+                <input type="text" id="input-speed-sp" class="form-control" placeholder="&micro;L/s">
+            </div>
+        </div>
+
+        {# Multiple Pipette Manual Control Tab #}
+        <div id="mp-control" style="display:none">
+            <h3>Multiple Pipette Manual Control</h3>
+
+            {# User input fields #}
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">Volume</span>
+                <input type="text" id="input-volume-mp" class="form-control" placeholder="&micro;L">
+            </div>
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">Speed</span>
+                <input type="text" id="input-speed-mp" class="form-control" placeholder="&micro;L/s">
+            </div>
+        </div>
+
+        {# Gripper Manual Control Tab #}
+        <div id="gripper-control" style="display:none">
+            <h3>Gripper Manual Control</h3>
+
+            {# User input fields #}
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">Wrist Angle</span>
+                <input type="text" id="input-gripper-wrist" class="form-control" placeholder="-90&ordm; to 0&ordm;">
+            </div>
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:130px">Gripper Opening</span>
+                <input type="text" id="input-gripper-opening" class="form-control" placeholder="0% to 100%">
+            </div>
+        </div>
+    </div>
+{% endblock content_left %}
+
+{% block content_right %}
+    <h3>Current Location</h3>
+    <table class="table table-striped table-bordered">
+        <tbody>
+            <tr>
+                <td>X</td>
+                <td id="cur_x_mm"></td>
+            </tr>
+            <tr>
+                <td>Y</td>
+                <td id="cur_y_mm"></td>
+            </tr>
+            <tr>
+                <td>Z0</td>
+                <td id="cur_z0_mm"></td>
+            </tr>
+            <tr>
+                <td>Z1</td>
+                <td id="cur_z1_mm"></td>
+            </tr>
+            <tr>
+                <td>Z2</td>
+                <td id="cur_z2_mm"></td>
+            </tr>
+            <tr>
+                <td>SP</td>
+                <td id="cur_sp_ul"></td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock content_right %}
+
+{% block content_bottom %}
+    {# Move button and warning message #}
+    <div style="height:55px">
+        <button type="button" id="move-btn" class="btn btn-success btn-lg navbar-btn active" style="height:54px" onclick="move()">
+            <strong>Move <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></strong>
+        </button>
+        <div id='error-message' style="display:inline-block"></div>
+    </div>
+
+    <br>
+
+    {# Home buttons #}
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary" onclick="home(['XY', 'Z', 'SP', 'MP', 'G'])">
+            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home
+        </button>
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" style="position:relative;margin-top:36px;margin-left:-107px">
+            <li onclick="home(['XY'])"><a href="#">XY Axis</a></li>
+            <li onclick="home(['Z'])"><a href="#">Z Axis</a></li>
+            <li onclick="home(['SP'])"><a href="#">Single Pipette</a></li>
+            <li onclick="home(['MP'])"><a href="#">Multiple Pipette</a></li>
+            <li onclick="home(['G'])"><a href="#">Gripper</a></li>
+        </ul>
+    </div>
+{% endblock content_bottom %}
+

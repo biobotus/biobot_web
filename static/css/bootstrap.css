@@ -3027,7 +3027,10 @@ select[multiple].input-lg {
 .btn.focus,
 .btn:active.focus,
 .btn.active.focus {
+  /* BioBot Edit
   outline: 5px auto -webkit-focus-ring-color;
+  */
+  outline: 0;
   outline-offset: -2px;
 }
 .btn:hover,

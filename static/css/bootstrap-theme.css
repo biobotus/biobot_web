@@ -75,7 +75,10 @@ fieldset[disabled] .btn-danger {
 }
 .btn-default:hover,
 .btn-default:focus {
+  /* BioBot Edit
   background-color: #e0e0e0;
+  */
+  background: #e0e0e0;
   background-position: 0 -15px;
 }
 .btn-default:active,
@@ -116,7 +119,10 @@ fieldset[disabled] .btn-default.active {
 }
 .btn-primary:hover,
 .btn-primary:focus {
+  /* BioBot Edit
   background-color: #265a88;
+  */
+  background: #265a88;
   background-position: 0 -15px;
 }
 .btn-primary:active,
@@ -157,7 +163,10 @@ fieldset[disabled] .btn-primary.active {
 }
 .btn-success:hover,
 .btn-success:focus {
+  /* BioBot Edit
   background-color: #419641;
+  */
+  background: #419641;
   background-position: 0 -15px;
 }
 .btn-success:active,
@@ -198,7 +207,10 @@ fieldset[disabled] .btn-success.active {
 }
 .btn-info:hover,
 .btn-info:focus {
+  /* BioBot Edit
   background-color: #2aabd2;
+  */
+  background: #2aabd2;
   background-position: 0 -15px;
 }
 .btn-info:active,
@@ -239,7 +251,10 @@ fieldset[disabled] .btn-info.active {
 }
 .btn-warning:hover,
 .btn-warning:focus {
+  /* BioBot Edit
   background-color: #eb9316;
+  */
+  background: #eb9316;
   background-position: 0 -15px;
 }
 .btn-warning:active,
@@ -280,7 +295,10 @@ fieldset[disabled] .btn-warning.active {
 }
 .btn-danger:hover,
 .btn-danger:focus {
+  /* BioBot Edit
   background-color: #c12e2a;
+  */
+  background: #c12e2a;
   background-position: 0 -15px;
 }
 .btn-danger:active,
