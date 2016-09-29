@@ -1,0 +1,51 @@
+{% extends "layout_data.html" %}
+
+{% block title %}Manage users{% endblock title %}
+
+{% block content %}
+    <h1>Manage users</h1>
+    <table id="users" class="table table-striped table-bordered" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Last login</th>
+                <th>Admin</th>
+                <th>Change admin status</th>
+                <th>Delete user</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <th>{{user['username']}}</th>
+                    <th>{{convert_ts(user['last_login']) if 'last_login' in user else 'Never'}}</th>
+                    {% if user['admin'] %}
+                        <th>Yes</th>
+                        <th><a href="/manage_users/demote/{{user['username']}}"><span class="label label-warning">Revert to standard user</span></a></th>
+                    {% else %}
+                        <th>No</th>
+                        <th><a href="/manage_users/promote/{{user['username']}}"><span class="label label-success">Promote to admin</span></a></th>
+                    {% endif %}
+                    <th><a href="/manage_users/delete/{{user['username']}}"><span class="label label-danger">Delete user</span></a></th>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class=flashes>
+                {% for category, message in messages %}
+                    <h3><span class="label label-{{category}}">{{message}}</span></h3>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <script>
+        $(document).ready(function() {
+            $('#users').DataTable();
+        } );
+    </script>
+{% endblock content %}
+
