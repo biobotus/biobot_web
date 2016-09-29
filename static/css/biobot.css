@@ -15,3 +15,20 @@ button.eStop:hover {
 .full-width {
     display:block;
 }
+
+.lb-sm {
+      font-size: 12px;
+}
+
+.lb-md {
+      font-size: 16px;
+      padding-top: 0.4em;
+      padding-right: 0.5em;
+      padding-left: 0.5em;
+      padding-bottom: 0.5em;
+      margin-right: 10px;
+}
+
+.lb-lg {
+      font-size: 20px;
+}

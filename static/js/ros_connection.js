@@ -87,6 +87,6 @@ function add_global_topic() {
 }
 
 window.onload = function() {
-        ros_init();
+    ros_init();
 };
 

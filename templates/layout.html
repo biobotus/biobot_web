@@ -47,6 +47,19 @@
                 <ul class="nav navbar-nav">
                     <li class="active"><button class="navbar-toggle collapse in" data-toggle="collapse" id="menu-toggle-2"> <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span></button></li>
                 </ul>
+
+                <div class="nav navbar-nav navbar-right container-fluid" style="padding-top:3px">
+                    {% if not current_user.is_authenticated %}
+                        <a href="{{'/login?next=' + request.path}}"><button type="button" class="btn btn-info navbar-btn active">
+                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Log in
+                        </button></a>
+                    {% else %}
+                        <span class="label label-primary lb-md">Logged in as {{current_user.get_id()}}</span>
+                        <a href="/logout"><button type="button" class="btn btn-info navbar-btn active">
+                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Log out
+                        </button></a>
+                    {% endif %}
+                </div>
             </div> {# bs-navbar-collapse-1 #}
         </nav>
 
@@ -54,13 +67,17 @@
             {# Sidebar #}
             <div id="sidebar-wrapper">
                 <ul class="sidebar-nav nav-pills nav-stacked" id="menu">
-                    {{ format_sidebar('Home', 'home') }}
-                    {{ format_sidebar('Surveillance', 'facetime-video') }}
-                    {{ format_sidebar('Manual Control', 'dashboard') }}
-                    {{ format_sidebar('Mapping', 'globe') }}
-                    {{ format_sidebar('Biological Protocol', 'tint') }}
-                    {{ format_sidebar('Image Analysis', 'picture') }}
-                    {{ format_sidebar('Log', 'search') }}
+                    {{ format_sidebar('Home', 'home', 'home') }}
+                    {{ format_sidebar('Surveillance', 'facetime-video', 'surveillance') }}
+                    {{ format_sidebar('Manual Control', 'dashboard', 'control') }}
+                    {{ format_sidebar('Mapping', 'globe', 'mapping') }}
+                    {{ format_sidebar('Biological Protocol', 'tint', 'protocol') }}
+                    {{ format_sidebar('Image Analysis', 'picture', 'analysis') }}
+                    {{ format_sidebar('Logs', 'search', 'logs') }}
+                    {% if current_user.is_authenticated and current_user.is_admin() %}
+                        {{ format_sidebar('Manage Users', 'tasks', 'manage_users') }}
+                        {{ format_sidebar('Delete Logs', 'floppy-remove', 'delete_logs') }}
+                    {% endif %}
                 </ul>
             </div> {# sidebar-wrapper #}
 

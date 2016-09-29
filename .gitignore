@@ -8,4 +8,4 @@
 *.log
 */old/*
 *.swp
-
+old*
