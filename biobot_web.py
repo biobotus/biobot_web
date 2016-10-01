@@ -12,6 +12,7 @@ import json
 import hashlib
 import pandas
 import pymongo
+import socket
 import time
 import uuid
 
@@ -61,9 +62,23 @@ parser.set_defaults(debug=conf.debug)
 args = parser.parse_args()
 conf.__dict__.update(args.__dict__)
 
+# Make sure Database host is reachable, else try localhost
+try:
+    socket.gethostbyaddr(conf.db_host)
+except socket.herror:
+    print("Database unreachable at host {0}, trying localhost...".format(conf.db_host))
+    conf.db_host = 'localhost'
+
 # Get MongoDB Database Client
 client = pymongo.MongoClient("{0}:{1}".format(conf.db_host, conf.db_port))
 biobot = client['biobot']
+
+# Validate MongoDB is started, else exit
+try:
+    client.server_info()
+except pymongo.errors.ServerSelectionTimeoutError:
+    print('MongoDB is not started. Restart it before launching the web app again.')
+    quit()
 
 # Create Flask Application
 app = Flask(__name__)
@@ -261,7 +276,16 @@ def format_sidebar(name, icon, url):
 
     return Markup(html)
 
-app.jinja_env.globals.update(format_sidebar=format_sidebar, convert_ts=convert_ts)
+app.jinja_env.globals.update(conf=conf,
+                             force_type = 'onselect="return false" ' \
+                                          'onpaste="return false" ' \
+                                          'oncopy="return false" ' \
+                                          'oncut="return false" ' \
+                                          'ondrag="return false" ' \
+                                          'ondrop="return false" ' \
+                                          'autocomplete=off',
+                             format_sidebar=format_sidebar,
+                             convert_ts=convert_ts)
 
 # Start the application
 if __name__ == '__main__':

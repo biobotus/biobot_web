@@ -7,12 +7,12 @@
     <form action="" method="post">
         <div class="input-group" style="width:50%">
             <span class="input-group-addon" style="width:150px">Username</span>
-            <input type=text name="username" class="form-control" autofocus>
+            <input type=text name="username" class="form-control" maxlength="{{conf.limit_input_md}}" autofocus>
         </div>
 
         <div class="input-group" style="width:50%">
             <span class="input-group-addon" style="width:150px">Password</span>
-            <input type=password name="password" class="form-control">
+            <input type=password name="password" class="form-control" maxlength="{{conf.limit_input_md}}" {{force_type|safe}}>
         </div>
 
         <input type=submit value=Login class="btn btn-success btn-lg navbar-btn">

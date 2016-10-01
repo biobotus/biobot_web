@@ -46,12 +46,12 @@
             {# User input fields #}
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">X</span>
-                <input type="text" id="input-x" class="form-control" placeholder="x mm">
+                <input type="text" id="input-x" class="form-control" placeholder="x mm" maxlength="{{conf.limit_input_sm}}">
             </div>
 
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Y</span>
-                <input type="text" id="input-y" class="form-control" placeholder="y mm">
+                <input type="text" id="input-y" class="form-control" placeholder="y mm" maxlength="{{conf.limit_input_sm}}">
             </div>
 
             <div class="input-group form-group" style="width:260px">
@@ -65,7 +65,7 @@
                         <li onclick="select('z_mode', 'Gripper')"><a href="#">Gripper</a></li>
                     </ul>
                 </div>
-                <input type="text" id="input-z" class="form-control" placeholder="z mm">
+                <input type="text" id="input-z" class="form-control" placeholder="z mm" maxlength="{{conf.limit_input_sm}}">
             </div>
         </div>
 
@@ -76,11 +76,11 @@
             {# User input fields #}
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Volume</span>
-                <input type="text" id="input-volume-sp" class="form-control" placeholder="&micro;L">
+                <input type="text" id="input-volume-sp" class="form-control" placeholder="&micro;L" maxlength="{{conf.limit_input_sm}}">
             </div>
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Speed</span>
-                <input type="text" id="input-speed-sp" class="form-control" placeholder="&micro;L/s">
+                <input type="text" id="input-speed-sp" class="form-control" placeholder="&micro;L/s" maxlength="{{conf.limit_input_sm}}">
             </div>
         </div>
 
@@ -91,11 +91,11 @@
             {# User input fields #}
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Volume</span>
-                <input type="text" id="input-volume-mp" class="form-control" placeholder="&micro;L">
+                <input type="text" id="input-volume-mp" class="form-control" placeholder="&micro;L" maxlength="{{conf.limit_input_sm}}">
             </div>
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Speed</span>
-                <input type="text" id="input-speed-mp" class="form-control" placeholder="&micro;L/s">
+                <input type="text" id="input-speed-mp" class="form-control" placeholder="&micro;L/s" maxlength="{{conf.limit_input_sm}}">
             </div>
         </div>
 
@@ -106,11 +106,11 @@
             {# User input fields #}
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Wrist Angle</span>
-                <input type="text" id="input-gripper-wrist" class="form-control" placeholder="-90&ordm; to 0&ordm;">
+                <input type="text" id="input-gripper-wrist" class="form-control" placeholder="-90&ordm; to 0&ordm;" maxlength="{{conf.limit_input_sm}}">
             </div>
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Gripper Opening</span>
-                <input type="text" id="input-gripper-opening" class="form-control" placeholder="0% to 100%">
+                <input type="text" id="input-gripper-opening" class="form-control" placeholder="0% to 100%" maxlength="{{conf.limit_input_sm}}">
             </div>
         </div>
     </div>
