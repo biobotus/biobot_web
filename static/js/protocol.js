@@ -31,17 +31,6 @@ window.onload = function() {
     window.addEventListener('drop', preventDefault, false);
 };
 
-function get_date_string() {
-    var date = new Date();
-    var year = date.getFullYear();
-    var month = ('0' + (date.getMonth() + 1)).slice(-2);
-    var day = ('0' + date.getDate()).slice(-2);
-    var hour = ('0' + date.getHours()).slice(-2);
-    var min = ('0' + date.getMinutes()).slice(-2);
-    var sec = ('0' + date.getSeconds()).slice(-2);
-    return year + '-' + month + '-' + day + '_' + hour + 'h' + min + 'm' + sec + 's'
-}
-
 function clear_deck() {
     clear_deck_warning()
     deck.disabled = false

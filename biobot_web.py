@@ -46,15 +46,15 @@ Modify file 'config.json' to edit the application's configuration.
 There are other command line arguments that can be used:
 """
 
-help_host = "Hostname of the Flask app. Default: {0}".format(conf.host)
-help_port = "Port of the Flask app. Default: {0}".format(conf.port)
+help_host = "Hostname of the Flask app. Default: {0}".format(conf.app_host)
+help_port = "Port of the Flask app. Default: {0}".format(conf.app_port)
 help_debug = "Start Flask app in debug mode. Default: {0}".format(conf.debug)
 
 # Set up the command-line arguments
 parser = argparse.ArgumentParser(description=app_description,
                                  formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('-H', '--host', help=help_host, default=conf.host)
-parser.add_argument('-P', '--port', help=help_port, default=conf.port)
+parser.add_argument('-H', '--host', help=help_host, default=conf.app_host)
+parser.add_argument('-P', '--port', help=help_port, default=conf.app_port)
 parser.add_argument('-D', '--debug', dest='debug', action='store_true', help=help_debug)
 parser.set_defaults(debug=conf.debug)
 
@@ -203,7 +203,7 @@ def home():
 
 @app.route('/surveillance')
 def surveillance():
-    return render_template('surveillance.html', conf=conf)
+    return render_template('surveillance.html')
 
 @app.route('/control')
 @login_required
@@ -214,6 +214,11 @@ def control():
 @login_required
 def protocol():
     return render_template('protocol.html')
+
+@app.route('/editor')
+@login_required
+def editor():
+    return render_template('editor.html')
 
 @app.route('/manage_users')
 @login_required
@@ -226,39 +231,120 @@ def manage_users():
 @login_required
 @admin_required
 def demote_user(username):
-    biobot.credentials.update_one({'username': username}, {'$set': {'admin': False}})
-    flash("User {0} reverted to standard user successfully".format(username), 'info')
+    user = biobot.credentials.find_one({'username': username})
+    if current_user.get_id() == username:
+        flash('Cannot revert yourself to standard user', 'danger')
+    elif user:
+        if user['admin']:
+            biobot.credentials.update_one(user, {'$set': {'admin': False}})
+            flash("User {0} reverted to standard user successfully".format(username), 'info')
+        else:
+            flash("User {0} is already a standard user".format(username), 'warning')
+    else:
+        flash("Cannot revert unknown user {0} to standard user".format(username), 'warning')
+
     return redirect(url_for('manage_users'))
 
 @app.route('/manage_users/promote/<username>')
 @login_required
 @admin_required
 def promote_user(username):
-    biobot.credentials.update_one({'username': username}, {'$set': {'admin': True}})
-    flash("User {0} promoted to administrator successfully".format(username), 'info')
+    user = biobot.credentials.find_one({'username': username})
+    if user:
+        if user['admin']:
+            flash("User {0} is already an administrator".format(username), 'warning')
+        else:
+            biobot.credentials.update_one(user, {'$set': {'admin': True}})
+            flash("User {0} promoted to administrator successfully".format(username), 'info')
+    else:
+        flash("Cannot promote unknown user {0} to administrator".format(username), 'warning')
+
     return redirect(url_for('manage_users'))
 
 @app.route('/manage_users/delete/<username>')
 @login_required
 @admin_required
 def delete_user(username):
+    user = biobot.credentials.find_one({'username': username})
     if current_user.get_id() == username:
         flash('Cannot delete yourself', 'danger')
-    else:
-        biobot.credentials.delete_one({'username': username})
+    elif user:
+        biobot.credentials.delete_one(user)
         flash("User {0} deleted successfully".format(username), 'info')
+    else:
+        flash("Cannot delete unknown user {0}".format(username), 'warning')
+
     return redirect(url_for('manage_users'))
+
+@app.route('/manage_labware', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def manage_labware():
+    if request.method == 'POST':
+        name = request.form['name'].lower()
+        description = request.form['description']
+        item = biobot.labware.find_one({'name': name})
+        if not name:
+            flash('Empty labware item name is invalid', 'danger')
+        elif item:
+            flash("Labware item {0} already exists".format(name), 'warning')
+        else:
+            biobot.labware.insert_one({'name': name, 'description': description})
+            flash("Labware item {0} added successfully".format(name), 'success')
+
+    labware_list = list(biobot.labware.find())
+    return render_template('manage_labware.html', labware=labware_list)
+
+@app.route('/manage_labware/delete/<name>')
+@login_required
+@admin_required
+def delete_labware(name):
+    item = biobot.labware.find_one({'name': name})
+    if item:
+        biobot.labware.delete_one(item)
+        flash("Item {0} deleted successfully".format(name), 'info')
+    else:
+        flash("Cannot delete unknown item {0}".format(name), 'danger')
+
+    return redirect(url_for('manage_labware'))
 
 @app.route('/bad_permissions')
 def bad_permissions():
     return render_template('bad_permissions.html')
+
+
+@app.route('/get/schema/labware')
+def get_labware_schema():
+    labware_names = sorted([item['name'] for item in biobot.labware.find()])
+
+    schema = {
+        'type': 'array',
+        'title': 'Labware',
+        'format': 'tabs',
+        'maxItems': conf.max_labware_items,
+        'items': {
+            'title': 'Item',
+            'headerTemplate': '{{i}} - {{self.name}}',
+            'type': 'object',
+            'properties': {
+                'name': {
+                    'type': 'string',
+                    'enum': labware_names,
+                    'propertyOrder': 1
+                }
+            },
+            'required': ['name']
+        }
+    }
+
+    return json.dumps(schema)
 
 @app.errorhandler(404)
 def page_not_found(error):
     """This method handles all unexisting route requests"""
     return render_template('404.html'), 404
 
-# Add methods that can be called from the Jinja2 HTML templates
+# Add objects that can be called from the Jinja2 HTML templates
 def convert_ts(ts):
     """Convert timestamp to human-readable string"""
     return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
@@ -277,17 +363,17 @@ def format_sidebar(name, icon, url):
     return Markup(html)
 
 app.jinja_env.globals.update(conf=conf,
-                             force_type = 'onselect="return false" ' \
+                             force_type = Markup('onselect="return false" ' \
                                           'onpaste="return false" ' \
                                           'oncopy="return false" ' \
                                           'oncut="return false" ' \
                                           'ondrag="return false" ' \
                                           'ondrop="return false" ' \
-                                          'autocomplete=off',
+                                          'autocomplete=off'),
                              format_sidebar=format_sidebar,
                              convert_ts=convert_ts)
 
 # Start the application
 if __name__ == '__main__':
-    app.run(debug=conf.debug, host=conf.host, port=int(conf.port))
+    app.run(debug=conf.debug, host=conf.app_host, port=int(conf.app_port))
 

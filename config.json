@@ -1,12 +1,15 @@
 {
-    "host": "0.0.0.0",
-    "port": "5000",
+    "app_host": "0.0.0.0",
+    "app_port": "5000",
     "debug": false,
-    "webcam_host": "10.43.156.11",
-    "webcam_port": "10088",
     "db_host": "10.43.156.161",
     "db_port": "27017",
     "limit_input_sm": 10,
     "limit_input_md": 50,
-    "limit_textarea": 10000
+    "limit_input_lg": 300,
+    "limit_textarea_sm": 300,
+    "limit_textarea_lg": 10000,
+    "max_labware_items": 30,
+    "webcam_host": "10.43.156.11",
+    "webcam_port": "10088"
 }

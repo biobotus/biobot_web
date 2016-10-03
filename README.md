@@ -1,6 +1,6 @@
 # BioBot Web Application
 
-The web page is built with a combination of popular Open Source tools : [Python Flask], [Roslibjs], [Bootstrap], [DataTables], [MongoDB] and [MJPG-Streamer].
+The web page is built with a combination of multiple Open Source tools : [Python Flask], [Roslibjs], [Bootstrap], [DataTables], [MongoDB], [MJPG-Streamer] and [JSON Editor].
 
 ![BioBot Home Page](/static/img/home_page.png "BioBot Home Page")
 
@@ -29,16 +29,18 @@ optional arguments:
 | Login | Log in to the web application. Creating account and changing password features are implemented. |
 | Surveillance | Display live stream video of the robot, which comes from the webcam. |
 | Manual Control* | Manually control BioBot : Axis, Single Pipette, Multiple Pipette and Gripper. The current position of the robot refreshes automatically after every step. |
-| Biological Protocol* | Create, modify, open or save deck and protocol files, as well as sending them to the Planner ROS node.
+| Biological Protocol* | Create, modify, open or save deck and protocol files, as well as sending them to the Planner ROS node. |
+| Protocol Editor* | Graphically create biological protocols without needing to type any JSON! This uses the JSON Editor project, as well as custom BioBot JSON Schemas requested to the server Flask with Ajax requests. |
 | Manage Users** | View all users, last login time and admin status. Can change admin status of users and delete them. |
+| Manage Labware** | View, add and/or remove labware items, used in the Protocol Editor's labware section. |
 &ast; Requires login  
 &ast;&ast;Requires administrator rights
 
-[Python Flask]: <http://flask.pocoo.org/>
+[Python Flask]: <http://flask.pocoo.org>
 [Roslibjs]: <http://wiki.ros.org/roslibjs>
-[Bootstrap]: <http://getbootstrap.com/>
-[DataTables]: <https://datatables.net/>
-[MongoDB]: <https://www.mongodb.com/>
-[MJPG-Streamer]: <https://sourceforge.net/projects/mjpg-streamer/>
-
+[Bootstrap]: <http://getbootstrap.com>
+[DataTables]: <https://datatables.net>
+[MongoDB]: <https://www.mongodb.com>
+[MJPG-Streamer]: <https://sourceforge.net/projects/mjpg-streamer>
+[JSON Editor]: <https://github.com/jdorn/json-editor>
 

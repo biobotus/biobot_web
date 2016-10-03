@@ -32,3 +32,15 @@ button.eStop:hover {
 .lb-lg {
       font-size: 20px;
 }
+
+.w50pc {
+    width: 50%
+}
+
+.w75pc {
+    width: 75%
+}
+
+.w150px {
+    width: 150px
+}
