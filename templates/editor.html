@@ -6,11 +6,13 @@
     {{ super() }}
     <script src="{{ url_for('static', filename='js/FileSaver.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jsoneditor.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/protocol.css') }}">
 {% endblock includes %}
 
 {% block content %}
     <h1>Protocol Editor</h1>
-    <div onclick="save_protocol()" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save created protocol</div>
+    <button onclick="save_protocol()" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save protocol</button>
+    <button class="btn btn-primary btn-file"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Open protocol<input id="open-protocol" type="file" accept=".json"></button>
 
     <h3>Reference information</h3>
     <div class="input-group w75pc">
@@ -25,7 +27,14 @@
         <span class="input-group-addon w150px">Description</span>
         <textarea id="protocol_description" class="form-control" cols="40" rows="3" maxlength="{{conf.limit_textarea_sm}}"></textarea>
     </div>
-    <div id="labware_holder"></div>
-    <div id="instructions_holder"></div>
+    <div class="container-fluid row">
+        <div id="labware_holder"></div>
+    </div>
+    <div class="container-fluid row">
+        <div id="containers_holder"></div>
+    </div>
+    <div class="container-fluid row">
+        <div id="instructions_holder"></div>
+    </div>
     <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
 {% endblock content %}

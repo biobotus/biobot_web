@@ -15,6 +15,8 @@ import pymongo
 import time
 import uuid
 
+import biobot_schema
+
 def hash_password(password):
     """This function hashes the password with SHA256 and a random salt"""
     salt = uuid.uuid4().hex
@@ -303,31 +305,19 @@ def delete_labware(name):
 def bad_permissions():
     return render_template('bad_permissions.html')
 
+@app.route('/get/schema/<value>')
+def get_schema(value):
+    """
+    Returns the JSON Schema asked by JavaScript Ajax Request.
+    If schema does not exist, it returns an empty JSON object.
+    """
 
-@app.route('/get/schema/labware')
-def get_labware_schema():
-    labware_names = sorted([item['name'] for item in biobot.labware.find()])
+    labware_cursor = biobot.labware.find({'type': {'$ne': 'Container'}})
+    containers_cursor = biobot.labware.find({'type': 'Container'})
+    labware = sorted([item['name'] for item in labware_cursor])
+    containers = sorted([item['name'] for item in containers_cursor])
 
-    schema = {
-        'type': 'array',
-        'title': 'Labware',
-        'format': 'tabs',
-        'maxItems': conf.max_labware_items,
-        'items': {
-            'title': 'Item',
-            'headerTemplate': '{{i}} - {{self.name}}',
-            'type': 'object',
-            'properties': {
-                'name': {
-                    'type': 'string',
-                    'enum': labware_names,
-                    'propertyOrder': 1
-                }
-            },
-            'required': ['name']
-        }
-    }
-
+    schema = biobot_schema.get_schema(value, conf, labware, containers)
     return json.dumps(schema)
 
 @app.errorhandler(404)
