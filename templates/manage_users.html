@@ -2,6 +2,12 @@
 
 {% block title %}Manage Users{% endblock title %}
 
+{% block includes %}
+    {{ super() }}
+
+    <script src="{{ url_for('static', filename='js/manage_users.js') }}"></script>
+{% endblock includes %}
+
 {% block content %}
     <h1>Manage Users</h1>
     <table id="table" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
@@ -17,16 +23,16 @@
         <tbody>
             {% for user in users %}
                 <tr>
-                    <th>{{user['username']}}</th>
-                    <th>{{convert_ts(user['last_login']) if 'last_login' in user else 'Never'}}</th>
+                    <td>{{user['username']}}</td>
+                    <td>{{convert_ts(user['last_login']) if 'last_login' in user else 'Never'}}</td>
                     {% if user['admin'] %}
-                        <th>Yes</th>
-                        <th><a href="/manage_users/demote/{{user['username']}}"><span class="btn btn-warning btn-xs">Revert to standard user</span></a></th>
+                        <td>Yes</td>
+                        <td><button class="btn btn-warning btn-xs" onclick="revert_user('{{user['username']}}')">Revert to standard user</button></td>
                     {% else %}
-                        <th>No</th>
-                        <th><a href="/manage_users/promote/{{user['username']}}"><span class="btn btn-success btn-xs">Promote to admin</span></a></th>
+                        <td>No</td>
+                        <td><button class="btn btn-success btn-xs" onclick="promote_user('{{user['username']}}')">Promote to admin</button></td>
                     {% endif %}
-                    <th><a href="/manage_users/delete/{{user['username']}}"><span class="btn btn-danger btn-xs">Delete user</span></a></th>
+                    <td><button class="btn btn-danger btn-xs" onclick="delete_user('{{user['username']}}')">Delete user</button></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -44,8 +50,9 @@
 
     <script>
         $(document).ready(function() {
-            $('#table').DataTable();
-        } );
+            var table = $('#table').DataTable();
+            table.on('draw.dt', setHeightSidebar);
+        });
     </script>
 {% endblock content %}
 
