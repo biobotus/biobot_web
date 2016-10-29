@@ -12,7 +12,6 @@ import json
 import hashlib
 import pandas
 import pymongo
-import socket
 import time
 import uuid
 
@@ -62,15 +61,8 @@ parser.set_defaults(debug=conf.debug)
 args = parser.parse_args()
 conf.__dict__.update(args.__dict__)
 
-# Make sure Database host is reachable, else try localhost
-try:
-    socket.gethostbyaddr(conf.db_host)
-except socket.herror:
-    print("Database unreachable at host {0}, trying localhost...".format(conf.db_host))
-    conf.db_host = 'localhost'
-
 # Get MongoDB Database Client
-client = pymongo.MongoClient("{0}:{1}".format(conf.db_host, conf.db_port))
+client = pymongo.MongoClient()
 biobot = client['biobot']
 
 # Validate MongoDB is started, else exit

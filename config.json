@@ -2,8 +2,6 @@
     "app_host": "0.0.0.0",
     "app_port": "5000",
     "debug": false,
-    "db_host": "10.43.156.161",
-    "db_port": "27017",
     "limit_input_sm": 10,
     "limit_input_md": 50,
     "limit_input_lg": 300,
