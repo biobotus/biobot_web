@@ -36,8 +36,9 @@ function setHeightSidebar() {
     var footer_height = document.getElementById("footer").offsetHeight;
     var height = $(window).height();
     height -= document.getElementById("bs-example-navbar-collapse-1").offsetHeight;
-    height -= document.getElementById("footer").offsetHeight;
-    document.getElementById("sidebar-wrapper").style.height = Math.max(height, menu_height+footer_height) + "px"
+    height -= footer_height;
+    var content = document.getElementById("page-content-wrapper").offsetHeight;
+    document.getElementById("sidebar-wrapper").style.height = Math.max(height, menu_height+footer_height, content) + "px"
 }
 
 window.onresize = function(event) {

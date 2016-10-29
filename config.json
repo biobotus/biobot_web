@@ -8,6 +8,8 @@
     "limit_textarea_sm": 300,
     "limit_textarea_lg": 10000,
     "max_labware_items": 30,
+    "rosbridge_host": "10.43.156.10",
+    "rosbridge_port": "9090",
     "webcam_host": "10.43.156.11",
     "webcam_port": "10088"
 }

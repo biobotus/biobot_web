@@ -42,23 +42,33 @@ function ros_init() {
         }
     });
 
-    ros.connect('ws://10.43.156.10:9090');
+    ros.connect('ws://' + ros_host + ':' + ros_port);
 
     add_global_topic()
 }
 
 function e_stop_send() {
-    var global_disable = new ROSLIB.Message({
-        data: false
-    });
-    global_enable_topic.publish(global_disable);
-    console.log("Publishing e-stop")
+    BootstrapDialog.confirm({
+        title: 'Emergency stop!',
+        message: 'Cancel all BioBot activities immediately? It will require a manual restart.',
+        type: BootstrapDialog.TYPE_DANGER,
+        btnOKLabel: 'Confirm',
+        callback: function(result){
+            if(result) {
+                var global_disable = new ROSLIB.Message({
+                    data: false
+                });
+                global_enable_topic.publish(global_disable);
+                console.log("Publishing e-stop")
 
-    var error = new ROSLIB.Message({
-        data: JSON.stringify({"error_code": "Sw0", "name": "BioBot_Web"})
-    });
+                var error = new ROSLIB.Message({
+                    data: JSON.stringify({"error_code": "Sw0", "name": "BioBot_Web"})
+                });
 
-    error_topic.publish(error)
+                error_topic.publish(error)
+            }
+        }
+    });
 }
 
 function add_global_topic() {
@@ -82,11 +92,16 @@ function add_global_topic() {
 
     step_done_topic.subscribe(function(message) {
         if (!message.data)
-            window.alert("Error: BioBot requires a manual restart.")
+            BootstrapDialog.show({
+                title: 'Error',
+                message: 'BioBot requires a manual restart.',
+                type: BootstrapDialog.TYPE_DANGER
+            });
     });
 }
 
 window.onload = function() {
+    setHeightSidebar();
     ros_init();
 };
 

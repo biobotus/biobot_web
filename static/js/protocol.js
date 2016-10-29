@@ -12,6 +12,7 @@ var open_protocol;
 var protocol_warning;
 
 window.onload = function() {
+    setHeightSidebar();
     ros_init();
     add_topic();
 

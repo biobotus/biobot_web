@@ -19,6 +19,7 @@
             {# Custom CSS #}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/simple-sidebar.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/biobot.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-dialog.min.css') }}">
 
             {# Bootstrap JavaScript files #}
             <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
@@ -28,6 +29,11 @@
             <script src="{{ url_for('static', filename='js/sidebar_menu.js') }}"></script>
             <script src="{{ url_for('static', filename='js/eventemitter2.js') }}"></script>
             <script src="{{ url_for('static', filename='js/roslib.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/bootstrap-dialog.min.js') }}"></script>
+            <script>
+                var ros_host = "{{conf.rosbridge_host}}";
+                var ros_port = "{{conf.rosbridge_port}}";
+            </script>
             <script src="{{ url_for('static', filename='js/ros_connection.js') }}"></script>
         {% endblock includes %}
 
@@ -70,15 +76,13 @@
                     {{ format_sidebar('Home', 'home', 'home') }}
                     {{ format_sidebar('Surveillance', 'facetime-video', 'surveillance') }}
                     {{ format_sidebar('Manual Control', 'dashboard', 'control') }}
-                    {{ format_sidebar('Mapping', 'globe', 'mapping') }}
+                    {#{{ format_sidebar('Mapping', 'globe', 'mapping') }}#}
                     {{ format_sidebar('Biological Protocol', 'tint', 'protocol') }}
                     {{ format_sidebar('Protocol Editor', 'edit', 'editor') }}
-                    {{ format_sidebar('Image Analysis', 'picture', 'analysis') }}
                     {{ format_sidebar('Logs', 'search', 'logs') }}
                     {% if current_user.is_authenticated and current_user.is_admin() %}
                         {{ format_sidebar('Manage Users', 'tasks', 'manage_users') }}
                         {{ format_sidebar('Manage Labware', 'briefcase', 'manage_labware') }}
-                        {{ format_sidebar('Delete Logs', 'floppy-remove', 'delete_logs') }}
                     {% endif %}
                 </ul>
             </div> {# sidebar-wrapper #}

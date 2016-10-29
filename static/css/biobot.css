@@ -1,3 +1,8 @@
+h1 {
+    color: #B22222;
+    font-weight: bold;
+}
+
 button.eStop {
     border: none;
     height: 111px;

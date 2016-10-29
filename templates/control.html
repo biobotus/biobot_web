@@ -9,6 +9,7 @@
 {% endblock includes %}
 
 {% block content_top %}
+    <h1>Manual Control</h1>
     {# Top Navigation Bar #}
     <nav class="navbar navbar-default navbar-static-top">
         <div class="container-fluid">
@@ -57,10 +58,10 @@
             <div class="input-group form-group" style="width:260px">
                 <div class="input-group-btn">
                     <button type="button" id="z_mode" style="width:130px" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Simple Pipette <span class="caret"></span>
+                        Single Pipette <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li onclick="select('z_mode', 'Simple Pipette')"><a href="#">Simple Pipette</a></li>
+                        <li onclick="select('z_mode', 'Single Pipette')"><a href="#">Single Pipette</a></li>
                         <li onclick="select('z_mode', 'Multiple Pipette')"><a href="#">Multiple Pipette</a></li>
                         <li onclick="select('z_mode', 'Gripper')"><a href="#">Gripper</a></li>
                     </ul>
@@ -69,9 +70,9 @@
             </div>
         </div>
 
-        {# Simple Pipette Manual Control Tab #}
+        {# Single Pipette Manual Control Tab #}
         <div id="sp-control" style="display:none">
-            <h3>Simple Pipette Manual Control</h3>
+            <h3>Single Pipette Manual Control</h3>
 
             {# User input fields #}
             <div class="input-group form-group" style="width:260px">
@@ -162,7 +163,7 @@
     {# Home buttons #}
     <div class="btn-group">
         <button type="button" class="btn btn-primary" onclick="home(['XY', 'Z', 'SP', 'MP', 'G'])">
-            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home
+            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Homing
         </button>
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>

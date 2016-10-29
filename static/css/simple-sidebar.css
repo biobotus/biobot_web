@@ -38,9 +38,11 @@
     padding: 15px;
     width: 100%;
     overflow-x: hidden;
+    margin-top: -10px;
 }
 .xyz{
     min-width: 360px;
+    margin-top: -15px;
 }
 
 #wrapper.toggled #page-content-wrapper {
