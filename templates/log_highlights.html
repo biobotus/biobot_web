@@ -1,0 +1,13 @@
+{% extends "layout_logs.html" %}
+
+{% block content_main %}
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active" role="progressbar" style="min-width:8em;width: {{100*done/started}}%;">
+        <strong>{{"{0}/{1} steps done ({2}%)".format(done, started, 100*done/started)}}</strong>
+      </div>
+    </div>
+
+    <h3>Raw protocol</h3>
+    <p>{{json_protocol|nl2br}}</p>
+{% endblock content_main %}
+

@@ -1,0 +1,24 @@
+{% extends "layout_logs.html" %}
+
+{% block content_main %}
+    <div class="table-responsive" style="overflow:visible">
+        <table>
+            <tr>
+                <td valign="top">
+                    <div class="container-fluid row" style="min-width:200px">
+                        {% block content_left %}{% endblock %}
+                    </div>
+                </td>
+                <td valign="top">
+                    <div class="container-fluid row">
+                        {% block content_right %}{% endblock %}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="container-fluid row">
+        {% block content_bottom %}{% endblock %}
+    </div>
+{% endblock content_main %}
+

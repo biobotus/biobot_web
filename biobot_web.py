@@ -2,16 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import base64
+from bson import ObjectId
 import datetime
-from flask import Flask, Markup, Response, abort, flash, redirect, \
+from flask import Flask, Markup, Response, abort, escape, flash, redirect, \
                   render_template, request, url_for
 from flask_login import LoginManager, UserMixin, current_user, login_required, \
                         login_user, logout_user
 from functools import wraps
+from gridfs import GridFS
+from jinja2 import evalcontextfilter
 import json
 import hashlib
-import pandas
+import pandas as pd
 import pymongo
+import re
 import time
 import uuid
 
@@ -34,6 +39,13 @@ def admin_required(func):
             return redirect(url_for('bad_permissions'))
         return func(*args, **kwargs)
     return decorated_function
+
+def valid_protocol(protocol):
+    if protocol in client.database_names() and protocol.startswith('protocol'):
+        return True
+    else:
+        flash("Protocol {0} does not exist".format(protocol), 'warning')
+        return False
 
 # Load default configuration
 with open('config.json') as config:
@@ -212,6 +224,73 @@ def protocol():
 def editor():
     return render_template('editor.html')
 
+@app.route('/logs')
+def logs():
+    stats = list(biobot.stats.find())
+    return render_template('logs.html', stats=stats)
+
+@app.route('/logs/<protocol>')
+def log_highlights(protocol):
+    if not valid_protocol(protocol):
+        return redirect(url_for('logs'))
+
+    db = client[protocol]
+    started = db.steps.count()
+    done = db.steps.count({'end': {'$exists': True}})
+    info = db.protocol.find_one()
+    json_protocol = {}
+    if info:
+        json_protocol = json.dumps(info['protocol'], indent=4, sort_keys=True)
+
+    return render_template('log_highlights.html', active='Highlights', \
+                           protocol=protocol, json_protocol=json_protocol, \
+                           started=started, done=done)
+
+@app.route('/logs/<protocol>/steps')
+def log_steps(protocol):
+    if not valid_protocol(protocol):
+        return redirect(url_for('logs'))
+
+    db = client[protocol]
+    steps = list(db.steps.find())
+    return render_template('log_steps.html', active='Steps', protocol=protocol, steps=steps)
+
+@app.route('/logs/<protocol>/colonies_analysis')
+@app.route('/logs/<protocol>/colonies_analysis/step/<int:step>')
+def log_colonies_analysis(protocol, step=None):
+    if not valid_protocol(protocol):
+        return redirect(url_for('logs'))
+
+    db = client[protocol]
+    colonies = list(db.colonies.find())
+
+    if not colonies:
+        flash("No bacterial colonies analysis was found for protocol {0}".format(protocol), 'warning')
+        return redirect("/logs/{0}".format(protocol))
+
+    df = pd.DataFrame(colonies)
+    steps = sorted(df.step.unique())
+    current_step = step if step else int(steps[0])
+    current_colonies = list(db.colonies.find({'step': current_step}))
+    colors = list(pd.DataFrame(current_colonies).color.unique())
+
+    return render_template('log_colonies_analysis.html', active='Colony', \
+                           protocol=protocol, steps=steps, current=current_step, \
+                           colonies=current_colonies, colors=colors)
+
+@app.route('/logs/delete/<protocol>')
+@login_required
+@admin_required
+def delete_logs(protocol):
+    if not valid_protocol(protocol):
+        flash("Cannot delete unexisting protocol {0}".format(protocol), 'danger')
+        return redirect(url_for('logs'))
+
+    stats = biobot.stats.delete_one({'id': protocol})
+    client.drop_database(protocol)
+    flash("Entry{0} deleted successfully".format(protocol), 'info')
+    return redirect(url_for('logs'))
+
 @app.route('/manage_users')
 @login_required
 @admin_required
@@ -326,6 +405,17 @@ def page_not_found(error):
     return render_template('404.html'), 404
 
 # Add objects that can be called from the Jinja2 HTML templates
+@app.template_filter()
+@evalcontextfilter
+def nl2br(eval_ctx, value):
+    _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
+    result = '\n\n'.join('<p>%s</p>' % p.replace('\n', '<br>\n') \
+        for p in _paragraph_re.split(escape(value)))
+    result = result.replace(' ', '&nbsp;')
+    if eval_ctx.autoescape:
+        result = Markup(result)
+    return result
+
 def convert_ts(ts):
     """Convert timestamp to human-readable string"""
     return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
@@ -345,6 +435,19 @@ def format_sidebar(name, icon, url):
 
     return Markup(html)
 
+def get_picture(protocol, filename, tags=""):
+    db = client[protocol]
+    image = db.images.find_one({'filename': filename})
+    if image:
+        image_id = image['image_id']
+        fs = GridFS(db)
+        img = fs.get(image_id).read()
+        b64data = base64.b64encode(img).decode('utf-8')
+        html = '<img src="data:image/jpeg;base64,{0}" {1}>'.format(b64data, tags)
+    else:
+        html = "<h3>Image {0} not found</h3>".format(filename)
+    return Markup(html)
+
 app.jinja_env.globals.update(conf=conf,
                              force_type = Markup('onselect="return false" ' \
                                           'onpaste="return false" ' \
@@ -354,7 +457,8 @@ app.jinja_env.globals.update(conf=conf,
                                           'ondrop="return false" ' \
                                           'autocomplete=off'),
                              format_sidebar=format_sidebar,
-                             convert_ts=convert_ts)
+                             convert_ts=convert_ts,
+                             get_picture=get_picture)
 
 # Start the application
 if __name__ == '__main__':
