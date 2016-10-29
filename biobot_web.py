@@ -132,7 +132,7 @@ def logout():
 def create_account():
     if request.method == 'POST':
         next = request.args.get('next')
-        username = request.form['username']
+        username = request.form['username'].strip()
         password = request.form['password']
         password_confirm = request.form['password_confirm']
 
@@ -271,15 +271,16 @@ def delete_user(username):
 @admin_required
 def manage_labware():
     if request.method == 'POST':
-        name = request.form['name'].lower()
+        name = request.form['name'].lower().strip().replace(' ', '_')
         description = request.form['description']
+        item_type = request.form['type']
         item = biobot.labware.find_one({'name': name})
         if not name:
             flash('Empty labware item name is invalid', 'danger')
         elif item:
             flash("Labware item {0} already exists".format(name), 'warning')
         else:
-            biobot.labware.insert_one({'name': name, 'description': description})
+            biobot.labware.insert_one({'name': name, 'description': description, 'type': item_type})
             flash("Labware item {0} added successfully".format(name), 'success')
 
     labware_list = list(biobot.labware.find())
