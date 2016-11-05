@@ -3,12 +3,16 @@
 
 """This file contains the JSON Schemas used for the protocol editor."""
 
-def get_schema(value, conf, labware, containers):
-    schema = {}
+def get_schema(value, conf, biobot):
+    containers_cursor = biobot.labware.find({'type': 'Container'})
+    containers = sorted([item['name'] for item in containers_cursor])
     generated = 'This is automatically generated from the previous two fields'
     pattern_description = 'Must be one or two uppercase letter followed by one or two digit'
+    schema = {}
 
     if value == 'labware':
+        labware_cursor = biobot.labware.find({'type': {'$ne': 'Container'}})
+        labware = sorted([item['name'] for item in labware_cursor])
         schema = {
             'title': 'Labware',
             'type': 'array',
@@ -282,6 +286,52 @@ def get_schema(value, conf, labware, containers):
                     pipette_s,
                     pipette_m
                 ]
+            }
+        }
+
+    elif value == 'deck':
+        deck_cursor = biobot.labware.find({'type': {'$ne': 'Tool'}})
+        deck = sorted([item['name'] for item in deck_cursor])
+
+        schema = {
+            'title': 'Deck',
+            'type': 'array',
+            'format': 'tabs',
+            'maxItems': conf.max_labware_items,
+            'uniqueItems': True,
+            'items': {
+                'title': 'Item',
+                'headerTemplate': '{{self.name}} ({{self.row}}{{self.col}})',
+                'type': 'object',
+                'properties': {
+                    'name': {
+                        'title': 'Type',
+                        'type': 'string',
+                        'enum': deck,
+                        'propertyOrder': 1
+                    },
+                    'id': {
+                        'title': 'ID/Name',
+                        'type': 'string',
+                        'description': 'Must not be empty',
+                        'pattern': '^(?!\s*$).+',
+                        'propertyOrder': 2
+                    },
+                    'row': {
+                        'title': 'Location (row)',
+                        'type': 'string',
+                        'description': 'A-Z',
+                        'pattern': '^[A-Z]{1}$',
+                        'propertyOrder': 3
+                    },
+                    'col': {
+                        'title': 'Location (column)',
+                        'type': 'string',
+                        'description': '0-99',
+                        'pattern': '^[0-9]{1,2}$',
+                        'propertyOrder': 4
+                    }
+                }
             }
         }
 

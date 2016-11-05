@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import ast
 import base64
 from bson import ObjectId
 import datetime
@@ -219,10 +220,28 @@ def control():
 def protocol():
     return render_template('protocol.html')
 
-@app.route('/editor')
+@app.route('/protocol_editor')
 @login_required
-def editor():
-    return render_template('editor.html')
+def protocol_editor():
+    return render_template('protocol_editor.html')
+
+@app.route('/deck_editor')
+@login_required
+def deck_editor():
+    return render_template('deck_editor.html')
+
+@app.route('/deck_editor/send/<b64_deck>')
+@login_required
+def receive_deck(b64_deck):
+    deck = ast.literal_eval(base64.b64decode(b64_deck).decode('utf-8'))
+    if deck:
+        biobot.deck.insert_many(deck)
+    return redirect(url_for('mapping'))
+
+@app.route('/mapping')
+@login_required
+def mapping():
+    return redirect(url_for('home'))
 
 @app.route('/logs')
 def logs():
@@ -391,12 +410,7 @@ def get_schema(value):
     If schema does not exist, it returns an empty JSON object.
     """
 
-    labware_cursor = biobot.labware.find({'type': {'$ne': 'Container'}})
-    containers_cursor = biobot.labware.find({'type': 'Container'})
-    labware = sorted([item['name'] for item in labware_cursor])
-    containers = sorted([item['name'] for item in containers_cursor])
-
-    schema = biobot_schema.get_schema(value, conf, labware, containers)
+    schema = biobot_schema.get_schema(value, conf, biobot)
     return json.dumps(schema)
 
 @app.errorhandler(404)

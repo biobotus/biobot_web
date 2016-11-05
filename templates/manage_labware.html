@@ -5,6 +5,7 @@
 {% block includes %}
     {{ super() }}
 
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.columnFilter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/manage_labware.js') }}"></script>
 {% endblock includes %}
 
@@ -67,8 +68,15 @@
 
     <script>
         $(document).ready(function() {
-            var table = $('#table').DataTable({
+            var table = $('#table').dataTable({
                 "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]]
+            }).columnFilter({
+                sPlaceHolder: "head:before",
+                aoColumns:[
+                    null,
+                    null,
+                    {type: "select", values: ['Tool', 'Module', 'Container', 'Disposable']}
+                ]
             });
             table.on('draw.dt', setHeightSidebar());
         } );
