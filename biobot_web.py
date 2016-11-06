@@ -235,13 +235,41 @@ def deck_editor():
 def receive_deck(b64_deck):
     deck = ast.literal_eval(base64.b64decode(b64_deck).decode('utf-8'))
     if deck:
+        for i in range(len(deck)):
+            deck[i]['source'] = 'deck_editor'
+            deck[i]['uuid'] = uuid.uuid4().hex
         biobot.deck.insert_many(deck)
     return redirect(url_for('mapping'))
 
 @app.route('/mapping')
 @login_required
 def mapping():
-    return redirect(url_for('home'))
+    from_editor = list(biobot.deck.find({'source': 'deck_editor',
+                                         'validated': {'$exists': False}}))
+    from_carto = list(biobot.deck.find({'source': '3d_cartography',
+                                        'validated': {'$exists': False}}))
+    validated = list(biobot.deck.find({'validated': True}))
+
+    return render_template('mapping.html', from_editor=from_editor,
+                           from_carto=from_carto, validated=validated)
+
+@app.route('/mapping/delete/<uid>')
+@login_required
+def mapping_delete(uid):
+    biobot.deck.delete_one({'uuid': uid})
+    return redirect(url_for('mapping'))
+
+@app.route('/mapping/modify/<uid>')
+@login_required
+def mapping_modify(uid):
+    biobot.deck.update_one({'uuid': uid}, {'$unset': {'validated': ''}})
+    return redirect(url_for('mapping'))
+
+@app.route('/mapping/validate/<uid>', methods=['GET', 'POST'])
+@login_required
+def mapping_validate(uid):
+    # To be implemented
+    return redirect(url_for('mapping'))
 
 @app.route('/logs')
 def logs():
@@ -449,9 +477,10 @@ def format_sidebar(name, icon, url):
 
     return Markup(html)
 
-def get_picture(protocol, filename, tags=""):
-    db = client[protocol]
-    image = db.images.find_one({'filename': filename})
+def get_picture(database, collection, filename, tags=""):
+    db = client[database]
+    coll = db[collection]
+    image = coll.find_one({'filename': filename})
     if image:
         image_id = image['image_id']
         fs = GridFS(db)
@@ -459,7 +488,7 @@ def get_picture(protocol, filename, tags=""):
         b64data = base64.b64encode(img).decode('utf-8')
         html = '<img src="data:image/jpeg;base64,{0}" {1}>'.format(b64data, tags)
     else:
-        html = "<h3>Image {0} not found</h3>".format(filename)
+        html = "Image {0} not found".format(filename)
     return Markup(html)
 
 app.jinja_env.globals.update(conf=conf,

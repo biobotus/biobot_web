@@ -1,0 +1,126 @@
+{% extends "layout_data.html" %}
+
+{% block title %}Mapping{% endblock title %}
+
+{% block includes %}
+    {{ super() }}
+
+    <script src="{{ url_for('static', filename='js/mapping.js') }}"></script>
+{% endblock includes %}
+
+
+{% block content %}
+    <h1>Deck Mapping</h1>
+    {% if from_editor %}
+        <h3>Labware to validate from deck editor</h3>
+        <table id="table_from_editor" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>ID/Name</th>
+                    <th>Type</th>
+                    <th>Row</th>
+                    <th>Column</th>
+                    <th>Validate</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in from_editor %}
+                    <tr>
+                        <td>{{item['id']}}</td>
+                        <td>{{item['name']}}</td>
+                        <td>{{item['row']}}</td>
+                        <td>{{item['col']}}</td>
+                        <td><button class="btn btn-default btn-xs" onclick="validate_item('{{item['uuid']}}')">Validate item</button></td>
+                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}','{{item['uuid']}}')">Delete item</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if from_carto %}
+        <h3>Labware to validate from 3D cartography</h3>
+        <table id="table_from_carto" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Picture</th>
+                    <th>ID/Name</th>
+                    <th>Type</th>
+                    <th>X (mm - approx.)</th>
+                    <th>Y (mm - approx.)</th>
+                    <th>Z (mm - approx.)</th>
+                    <th>Validate</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in from_carto %}
+                    <tr>
+                        <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}
+                        <td>{{item['id']}}</td>
+                        <td>{{item['name']}}</td>
+                        <td>{{item['carto_x']}}</td>
+                        <td>{{item['carto_y']}}</td>
+                        <td>{{item['carto_z']}}</td>
+                        <td><button class="btn btn-default btn-xs" onclick="validate_item('{{item['uuid']}}')">Validate item</button></td>
+                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}','{{item['uuid']}}')">Delete item</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if validated %}
+        <h3>Labware with validated location</h3>
+        <table id="table_validated" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Picture</th>
+                    <th>ID/Name</th>
+                    <th>Type</th>
+                    <th>X (mm)</th>
+                    <th>Y (mm)</th>
+                    <th>Z (mm)</th>
+                    <th>Modify</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in validated %}
+                    <tr>
+                        {% if item['source'] == '3d_cartography' %}
+                            <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                        <td>{{item['id']}}</td>
+                        <td>{{item['name']}}</td>
+                        <td>{{item['valid_x']}}</td>
+                        <td>{{item['valid_y']}}</td>
+                        <td>{{item['valid_z']}}</td>
+                        <td><button class="btn btn-warning btn-xs" onclick="modify_item('{{item['name']}}','{{item['uuid']}}')">Modify item</button></td>
+                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}','{{item['uuid']}}')">Delete item</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <script>
+        $(document).ready(function() {
+            $('#table_from_editor').dataTable({
+                "lengthMenu": [[5], [5]],
+                "dom": "rtip"
+            });
+
+            $('#table_from_carto').dataTable({
+                "lengthMenu": [[5], [5]],
+                "dom": "rtip"
+            });
+
+            $('#table_validated').dataTable();
+        });
+    </script>
+{% endblock content %}
+

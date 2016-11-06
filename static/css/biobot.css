@@ -49,3 +49,8 @@ button.eStop:hover {
 .w150px {
     width: 150px
 }
+
+.deck_img {
+    max-width: 150px;
+    max-height: 150px;
+}

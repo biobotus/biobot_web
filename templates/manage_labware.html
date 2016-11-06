@@ -59,7 +59,7 @@
                 <tr>
                     <td>{{item['name']}}</td>
                     <td>{{item['description']}}</td>
-                    <td>{{item.get('type', '')}}</td>
+                    <td>{{item['type']}}</td>
                     <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}')">Delete item</button></td>
                 </tr>
             {% endfor %}
