@@ -57,14 +57,20 @@ function move() {
             if (!$.isNumeric(x_step)) {
                 x_step = 0;
                 input_x.value = x_step;
+            } else {
+                x_step = parseFloat(x_step);
             }
             if (!$.isNumeric(y_step)) {
                 y_step = 0;
                 input_y.value = y_step;
+            } else {
+                y_step = parseFloat(y_step);
             }
             if (!$.isNumeric(z_step)) {
                 z_step = 0;
                 input_z.value = z_step;
+            } else {
+                z_step = parseFloat(z_step);
             }
 
             var rel_dict = {'params': {'name': 'pos', 'args': {'x': x_step, 'y': y_step, 'z': z_step}}}
@@ -91,6 +97,10 @@ function move() {
                 return
             }
 
+            x_step = parseFloat(x_step);
+            y_step = parseFloat(y_step);
+            z_step = parseFloat(z_step);
+
             var abs_dict = {'module_type': 'pipette_s', 'params': {'name': 'pos', 'args': {'x': x_step, 'y': y_step, 'z': z_step}}}
 
             console.log(JSON.stringify(abs_dict))
@@ -114,15 +124,21 @@ function move() {
         if (!$.isNumeric(volume)) {
             volume = 0;
             input_volume.value = volume;
+        } else {
+            volume = parseFloat(volume);
         }
 
         if (!$.isNumeric(speed) || speed <= 0) {
             input_speed.value = '';
             print_warning('Speed must be a number and greater than 0 µL/s.');
             return;
+        } else {
+            speed = parseFloat(speed);
         }
 
         var step_dict = {'module_type': 'pipette_s', 'params': {'name': 'manip', 'args': {'vol': volume, 'speed': speed}}}
+
+        console.log(JSON.stringify(step_dict));
 
         var new_step_sp = new ROSLIB.Message({
             data : JSON.stringify(step_dict)
@@ -153,7 +169,7 @@ function move() {
                 input_m0_val = 0;
             }
             input_m0.value = input_m0_val;
-            angle_dict[0] = input_m0_val;
+            angle_dict[0] = parseFloat(input_m0_val);
         }
 
         if (!$.isNumeric(input_op_val)) {
@@ -172,6 +188,8 @@ function move() {
 
         if (Object.keys(angle_dict).length != 0) {
             var step_dict = {'module_type': 'gripper', 'params': {'name': 'manip', 'args': angle_dict}}
+
+            console.log(JSON.stringify(step_dict));
 
             var new_step_gripper = new ROSLIB.Message({
                 data : JSON.stringify(step_dict)

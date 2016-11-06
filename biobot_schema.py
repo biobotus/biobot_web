@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 """This file contains the JSON Schemas used for the protocol editor."""
