@@ -256,7 +256,12 @@ def mapping():
 @app.route('/mapping/delete/<uid>')
 @login_required
 def mapping_delete(uid):
-    biobot.deck.delete_one({'uuid': uid})
+    item = biobot.deck.find_one({'uuid': uid})
+    if item:
+        if item['source'] == '3d_cartography':
+            fs = GridFS(biobot)
+            fs.delete(item['image_id'])
+        biobot.deck.delete_one(item)
     return redirect(url_for('mapping'))
 
 @app.route('/mapping/modify/<uid>')
@@ -268,8 +273,24 @@ def mapping_modify(uid):
 @app.route('/mapping/validate/<uid>', methods=['GET', 'POST'])
 @login_required
 def mapping_validate(uid):
-    # To be implemented
-    return redirect(url_for('mapping'))
+    if request.method == 'GET':
+        item = biobot.deck.find_one({'uuid': uid})
+        if item['source'] == 'deck_editor':
+            ini = {'x': conf.deck_length/100*int(item['col'])+conf.deck_length/200,
+                   'y': conf.deck_width/26*(ord(item['row'])-65)+conf.deck_width/52,
+                   'z': 0}
+        else:
+            ini = {'x': item['carto_x'],
+                   'y': item['carto_y'],
+                   'z': 0} # TODO use this value after some tests: item['carto_z']}
+        print(ini)
+        return render_template('validate.html', item=item, ini=ini)
+
+    else:
+        # To be modified soon
+        print(request.form)
+        return redirect(request.url)
+        return redirect(url_for('mapping'))
 
 @app.route('/logs')
 def logs():

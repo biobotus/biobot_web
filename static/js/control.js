@@ -1,5 +1,6 @@
 var listener;
 var new_step;
+var new_step_rel;
 var sections = ['axis', 'sp', 'mp', 'gripper'];
 var visible_section = 'axis';
 var axis_mode = 'Relative Movement';

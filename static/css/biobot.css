@@ -46,6 +46,10 @@ button.eStop:hover {
     width: 75%
 }
 
+.w100px {
+    width: 100px
+}
+
 .w150px {
     width: 150px
 }
@@ -53,4 +57,8 @@ button.eStop:hover {
 .deck_img {
     max-width: 150px;
     max-height: 150px;
+}
+
+.ib {
+    display: inline-block;
 }

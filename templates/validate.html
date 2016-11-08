@@ -1,0 +1,80 @@
+{% extends "layout_data.html" %}
+
+{% block title %}Validate Deck{% endblock title %}
+
+{% block includes %}
+    {{ super() }}
+
+    <script>var ini_x = {{ini['x']}}, ini_y = {{ini['y']}}, ini_z = {{ini['z']}};</script>
+    <script src="{{ url_for('static', filename='js/validate.js') }}"></script>
+{% endblock includes %}
+
+{% block content %}
+    <h1>Deck item validation</h1>
+    <h3>Item properties</h3>
+    <table class="table table-striped table-bordered" cellspacing="0" width="100%" style="width:auto !important;">
+        <thead>
+            <tr>
+                {% if item['source'] == '3d_cartography' %}
+                    <td>Picture</td>
+                {% endif %}
+                <th>ID/Name</th>
+                <th>Type</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Z</th>
+                <th>Confirm</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><form method="post">
+                {% if item['source'] == '3d_cartography' %}
+                    <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
+                {% endif %}
+                <td class="w150px">
+                    <input type=text name="id" class="form-control" value="{{item['id']}}" maxlength="{{conf.limit_input_md}}">
+                </td>
+                {% if item['name'] == 'tip_holder' %}
+                    <td>
+                        <input type="radio" name="name" value="small_tip_holder" checked> Small Tip Holder<br>
+                        <input type="radio" name="name" value="medium_tip_holder"> Medium Tip Holder<br>
+                        <input type="radio" name="name" value="large_tip_holder"> Large Tip Holder
+                    </td>
+                {% else %}
+                    <td><input type="text" name="name" class="form-control" value="{{item['name']}}" readonly></td>
+                {% endif %}
+                <td class="w150px"><div class="input-group">
+                    <input type="text" id="valid_x" name="valid_x" class="form-control" value="" readonly>
+                    <span class="input-group-addon">mm</span>
+                </div></td>
+                <td class="w150px"><div class="input-group">
+                    <input type="text" id="valid_y" name="valid_y" class="form-control" value="" readonly>
+                    <span class="input-group-addon">mm</span>
+                </div></td>
+                <td class="w150px"><div class="input-group">
+                    <input type="text" id="valid_z" name="valid_z" class="form-control" value="" readonly>
+                    <span class="input-group-addon">mm</span>
+                </div></td>
+                <td class="w150px"><input type=submit value="Confirm and save" class="btn btn-success"></td>
+            </form></tr>
+        </tbody>
+    </table>
+
+    <h3>Relative movements</h3>
+    {% for i in [('X', 'primary'), ('Y', 'default'), ('Z', 'primary')] %}
+        <div>
+            <h4 class="ib" style="margin-right:5px"><strong>Move {{i[0]}} (mm)</strong></h4>
+            {% for dist in [-100, -50, -20, -10, -5, -2, -1, 1, 2, 5, 10, 20, 50, 100] %}
+                <button class="btn btn-{{i[1]}} navbar-btn" onclick="move('{{i[0]}}', {{dist}})" style="width:55px">{{dist}}</button></td>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <script>
+        // Remove focus after pressing buttons
+        $(".btn").mouseup(function(){
+            $(this).blur();
+        })
+    </script>
+{% endblock content %}
+
