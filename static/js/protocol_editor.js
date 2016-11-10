@@ -27,20 +27,12 @@ JSONEditor.defaults.options = {
 }
 
 function save_protocol() {
-    var refs = labware.getValue();
-    var cont = containers.getValue();
-    refs.forEach(function(array, index) {
-        refs[index]['id'] = index;
-    });
-    refs = refs.concat(cont);
-
     var protocol = JSON.stringify({
         'name': p_name.value,
         'author': p_author.value,
         'description': p_description.value,
-        'refs': refs,
-        'instructions': instructions.getValue(),
-        'nb_containers': cont.length
+        'refs': labware.getValue(),
+        'instructions': instructions.getValue()
     });
 
     console.log(protocol);
@@ -64,19 +56,8 @@ function open_protocol_file(e) {
         p_name.value = contents['name'];
         p_author.value = contents['author'];
         p_description.value = contents['description'];
+        labware.setValue(contents['refs']);
         instructions.setValue(contents['instructions']);
-
-        var refs = [];
-        var c_r = contents['refs'];
-        var len = c_r.length - contents['nb_containers'];
-        for(var i = 0; i < len; i++) {
-            refs[i] = {'name': c_r[0]['name']};
-            c_r.shift();
-        }
-
-        labware.setValue(refs);
-        containers.setValue(c_r);
-
     };
     reader.readAsText(file);
     this.value = null;
@@ -95,36 +76,6 @@ labware.on("ready",function() {
 
 // Listen for changes
 labware.on("change", setHeightSidebar);
-
-var containers_holder = $("#containers_holder")[0];
-
-// Initialize the containers editor
-var containers = new JSONEditor(containers_holder, {schema: {$ref: "/get/schema/containers"}});
-
-// Wait for editor to be ready (required because Ajax is used)
-containers.on("ready",function() {
-    containers.validate();
-    $('.json-editor-btn-collapse').on("click", setHeightSidebar);
-});
-
-// Listen for changes
-containers.on("change",  function() {
-    setHeightSidebar();
-    var rows = containers.root.rows;
-    var value = containers.getValue();
-    var cur;
-    var ids = [];
-
-    for (var i = 0; i < rows.length; i++) {
-        cur = value[i]['id'];
-        if ($.inArray(cur, ids) >= 0)
-            rows[i].tab.style.color = "red";
-        else {
-            rows[i].tab.style.color = "";
-            ids.push(cur);
-        }
-    }
-});
 
 var instructions_holder = $("#instructions_holder")[0];
 
@@ -153,5 +104,4 @@ instructions.on("change",  function() {
         rows[tmp].tab.style.color = "red";
     }
 });
-
 

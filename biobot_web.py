@@ -250,6 +250,13 @@ def mapping():
                                         'validated': {'$exists': False}}))
     validated = list(biobot.deck.find({'validated': True}))
 
+    if from_editor or from_carto:
+        flash('Some labware location has to be validated.', 'warning')
+    elif len(validated) == 0:
+        flash('No labware has been found.', 'danger')
+    else:
+        flash('All labware has been validated.', 'success')
+
     return render_template('mapping.html', from_editor=from_editor,
                            from_carto=from_carto, validated=validated)
 
@@ -276,20 +283,22 @@ def mapping_validate(uid):
     if request.method == 'GET':
         item = biobot.deck.find_one({'uuid': uid})
         if item['source'] == 'deck_editor':
-            ini = {'x': conf.deck_length/100*int(item['col'])+conf.deck_length/200,
-                   'y': conf.deck_width/26*(ord(item['row'])-65)+conf.deck_width/52,
-                   'z': 0}
+            ini = {'x': round(conf.deck_length/100*int(item['col'])+conf.deck_length/200, 3),
+                   'y': round(conf.deck_width/26*(ord(item['row'])-65)+conf.deck_width/52, 3)}
         else:
-            ini = {'x': item['carto_x'],
-                   'y': item['carto_y'],
-                   'z': 0} # TODO use this value after some tests: item['carto_z']}
-        print(ini)
+            ini = {'x': round(item['carto_x'], 3),
+                   'y': round(item['carto_y'], 3)}
+
         return render_template('validate.html', item=item, ini=ini)
 
     else:
-        # To be modified soon
-        print(request.form)
-        return redirect(request.url)
+        biobot.deck.update_one({'uuid': uid}, {'$set': {'name': request.form['name'],
+                                                        'id': request.form['id'],
+                                                        'valid_x': request.form['valid_x'],
+                                                        'valid_y': request.form['valid_y'],
+                                                        'valid_z': request.form['valid_z'],
+                                                        'validated': True}})
+
         return redirect(url_for('mapping'))
 
 @app.route('/logs')

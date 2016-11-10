@@ -9,7 +9,8 @@ var z_ids = {'Simple Pipette': 0, 'Multiple Pipette': 1, 'Gripper': 2};
 
 // Variables used to display current position
 var cur_pos_ids = ['cur_x_mm', 'cur_y_mm', 'cur_z0_mm',
-                   'cur_z1_mm', 'cur_z2_mm', 'cur_sp_ul'];
+                   'cur_z1_mm', 'cur_z2_mm', 'cur_sp_ul',
+                   'cur_mp_ul'];
 var not_available = 'N/A';
 var cur_x_mm_str  = not_available;
 var cur_y_mm_str  = not_available;
@@ -17,6 +18,7 @@ var cur_z0_mm_str = not_available;
 var cur_z1_mm_str = not_available;
 var cur_z2_mm_str = not_available;
 var cur_sp_ul_str = not_available;
+var cur_mp_ul_str = not_available;
 
 function show(section) {
     visible_section = section;
@@ -149,7 +151,36 @@ function move() {
 
     } else if (visible_section == 'mp') {
         // Move Multiple Pipette
-        print_warning('Multiple Pipette move yet not implemented.');
+        var input_volume = $('#input-volume-mp')[0];
+        var input_speed = $('#input-speed-mp')[0];
+
+        var volume = input_volume.value;
+        var speed = input_speed.value;
+
+        if (!$.isNumeric(volume)) {
+            volume = 0;
+            input_volume.value = volume;
+        } else {
+            volume = parseFloat(volume);
+        }
+
+        if (!$.isNumeric(speed) || speed <= 0) {
+            input_speed.value = '';
+            print_warning('Speed must be a number and greater than 0 µL/s.');
+            return;
+        } else {
+            speed = parseFloat(speed);
+        }
+
+        var step_dict = {'module_type': 'pipette_m', 'params': {'name': 'manip', 'args': {'vol': volume, 'speed': speed}}}
+
+        console.log(JSON.stringify(step_dict));
+
+        var new_step_mp = new ROSLIB.Message({
+            data : JSON.stringify(step_dict)
+        });
+
+        new_step.publish(new_step_mp);
 
     } else if (visible_section == 'gripper') {
         // Move Gripper
@@ -294,6 +325,7 @@ function new_position (data) {
     cur_z1_mm_str = data[3].toFixed(3).toString() + mm;
     cur_z2_mm_str = data[4].toFixed(3).toString() + mm;
     cur_sp_ul_str = data[5].toFixed(3).toString() + ul;
+    cur_mp_ul_str = data[6].toFixed(3).toString() + ul;
 
     update_position();
 }

@@ -4,14 +4,10 @@
 """This file contains the JSON Schemas used for the protocol editor."""
 
 def get_schema(value, conf, biobot):
-    containers_cursor = biobot.labware.find({'type': 'Container'})
-    containers = sorted([item['name'] for item in containers_cursor])
-    generated = 'This is automatically generated from the previous two fields'
-    pattern_description = 'Must be one or two uppercase letter followed by one or two digit'
     schema = {}
 
     if value == 'labware':
-        labware_cursor = biobot.labware.find({'type': {'$ne': 'Container'}})
+        labware_cursor = biobot.labware.find()
         labware = sorted([item['name'] for item in labware_cursor])
         schema = {
             'title': 'Labware',
@@ -21,41 +17,20 @@ def get_schema(value, conf, biobot):
             'uniqueItems': True,
             'items': {
                 'title': 'Item',
-                'headerTemplate': '{{i}} - {{self.name}}',
-                'type': 'object',
-                'properties': {
-                    'name': {
-                        'title': 'Name',
-                        'type': 'string',
-                        'enum': labware
-                    }
-                }
-            }
-        }
-
-    elif value == 'containers':
-        schema = {
-            'title': 'Containers',
-            'type': 'array',
-            'format': 'tabs',
-            'maxItems': conf.max_labware_items,
-            'uniqueItems': True,
-            'items': {
-                'title': 'Container',
                 'headerTemplate': '{{self.name}} - {{self.id}}',
                 'type': 'object',
                 'properties': {
                     'name': {
                         'title': 'Category',
                         'type': 'string',
-                        'enum': containers,
+                        'enum': labware,
                         'propertyOrder': 1
                     },
                     'id': {
                         'title': 'Name',
                         'type': 'string',
-                        'description': 'Unique name containing at least one letter',
-                        'pattern': '[a-zA-Z]{1}',
+                        'description': 'Name must not be empty',
+                        'pattern': '^(?!\s*$).+',
                         'propertyOrder': 2
                     }
                 }
@@ -63,11 +38,14 @@ def get_schema(value, conf, biobot):
         }
 
     elif value == 'instructions':
+        generated = 'This is automatically generated from the previous two fields'
+        pattern_description = 'Must be one or two uppercase letter followed by one or two digit'
+
         from_dict = {
             'from_container': {
                 'title': 'From (container)',
                 'type': 'string',
-                'enum': containers,
+                'pattern': '^(?!\s*$).+',
                 'propertyOrder': 1
             },
             'from_location': {
@@ -94,7 +72,7 @@ def get_schema(value, conf, biobot):
             'to_container': {
                 'title': 'to (container)',
                 'type': 'string',
-                'enum': containers,
+                'pattern': '^(?!\s*$).+',
                 'propertyOrder': 4
             },
             'to_location': {

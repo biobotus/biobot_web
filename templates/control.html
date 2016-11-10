@@ -81,7 +81,7 @@
             </div>
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Speed</span>
-                <input type="text" id="input-speed-sp" class="form-control" placeholder="&micro;L/s" maxlength="{{conf.limit_input_sm}}">
+                <input type="text" id="input-speed-sp" class="form-control" value={{conf['default_pipette_speed']}} placeholder="&micro;L/s" maxlength="{{conf.limit_input_sm}}">
             </div>
         </div>
 
@@ -96,7 +96,7 @@
             </div>
             <div class="input-group form-group" style="width:260px">
                 <span class="input-group-addon" style="width:130px">Speed</span>
-                <input type="text" id="input-speed-mp" class="form-control" placeholder="&micro;L/s" maxlength="{{conf.limit_input_sm}}">
+                <input type="text" id="input-speed-mp" class="form-control" value={{conf['default_pipette_speed']}} placeholder="&micro;L/s" maxlength="{{conf.limit_input_sm}}">
             </div>
         </div>
 
@@ -144,6 +144,10 @@
             <tr>
                 <td>SP</td>
                 <td id="cur_sp_ul"></td>
+            </tr>
+            <tr>
+                <td>MP</td>
+                <td id="cur_mp_ul"></td>
             </tr>
         </tbody>
     </table>

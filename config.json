@@ -1,8 +1,8 @@
 {
     "app_host": "0.0.0.0",
     "app_port": "5000",
-    "deck_width": 10000,
-    "deck_length": 15000,
+    "deck_width": 1000,
+    "deck_length": 1500,
     "debug": false,
     "default_pipette_speed": 100,
     "limit_input_sm": 10,

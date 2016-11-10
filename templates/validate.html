@@ -5,7 +5,7 @@
 {% block includes %}
     {{ super() }}
 
-    <script>var ini_x = {{ini['x']}}, ini_y = {{ini['y']}}, ini_z = {{ini['z']}};</script>
+    <script>var ini_x = {{ini['x']}}, ini_y = {{ini['y']}};</script>
     <script src="{{ url_for('static', filename='js/validate.js') }}"></script>
 {% endblock includes %}
 
@@ -32,7 +32,7 @@
                     <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
                 {% endif %}
                 <td class="w150px">
-                    <input type=text name="id" class="form-control" value="{{item['id']}}" maxlength="{{conf.limit_input_md}}">
+                    <input type=text name="id" class="form-control" value="{{item.get('id', '')}}" maxlength="{{conf.limit_input_md}}">
                 </td>
                 {% if item['name'] == 'tip_holder' %}
                     <td>
@@ -44,15 +44,15 @@
                     <td><input type="text" name="name" class="form-control" value="{{item['name']}}" readonly></td>
                 {% endif %}
                 <td class="w150px"><div class="input-group">
-                    <input type="text" id="valid_x" name="valid_x" class="form-control" value="" readonly>
+                    <input type="text" id="valid_x" name="valid_x" class="form-control" value="{{item.get('valid_x', '')}}" readonly>
                     <span class="input-group-addon">mm</span>
                 </div></td>
                 <td class="w150px"><div class="input-group">
-                    <input type="text" id="valid_y" name="valid_y" class="form-control" value="" readonly>
+                    <input type="text" id="valid_y" name="valid_y" class="form-control" value="{{item.get('valid_y', '')}}" readonly>
                     <span class="input-group-addon">mm</span>
                 </div></td>
                 <td class="w150px"><div class="input-group">
-                    <input type="text" id="valid_z" name="valid_z" class="form-control" value="" readonly>
+                    <input type="text" id="valid_z" name="valid_z" class="form-control" value="{{item.get('valid_z', '')}}" readonly>
                     <span class="input-group-addon">mm</span>
                 </div></td>
                 <td class="w150px"><input type=submit value="Confirm and save" class="btn btn-success"></td>
@@ -65,10 +65,25 @@
         <div>
             <h4 class="ib" style="margin-right:5px"><strong>Move {{i[0]}} (mm)</strong></h4>
             {% for dist in [-100, -50, -20, -10, -5, -2, -1, 1, 2, 5, 10, 20, 50, 100] %}
-                <button class="btn btn-{{i[1]}} navbar-btn" onclick="move('{{i[0]}}', {{dist}})" style="width:55px">{{dist}}</button></td>
+                <button class="btn btn-{{i[1]}} navbar-btn" onclick="move('{{i[0]}}', {{dist}})" style="width:55px">{{dist}}</button>
             {% endfor %}
         </div>
     {% endfor %}
+
+    <h3>Absolute movements</h3>
+    <div><button class="btn btn-default navbar-btn" onclick="move_abs({{ini['x']}}, {{ini['y']}}, 0)" style="text-align:left">
+        Approximated location<br>
+        X: {{ini['x']}} mm<br>
+        Y: {{ini['y']}} mm
+    </button></div>
+    {% if 'valid_x' in item %}
+        <div><button class="btn btn-default navbar-btn" onclick="move_abs({{item['valid_x']}}, {{item['valid_y']}}, {{item['valid_z']}})" style="text-align:left">
+            Previously validated location<br>
+            X: {{item['valid_x']}} mm<br>
+            Y: {{item['valid_y']}} mm<br>
+            Z: {{item['valid_z']}} mm
+        </button></div>
+    {% endif %}
 
     <script>
         // Remove focus after pressing buttons
