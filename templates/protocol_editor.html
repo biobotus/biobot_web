@@ -1,16 +1,15 @@
 {% extends "layout.html" %}
 
-{% block title %}Protocol Editor{% endblock title %}
+{% block title %}Biological Protocol{% endblock title %}
 
 {% block includes %}
     {{ super() }}
     <script src="{{ url_for('static', filename='js/FileSaver.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jsoneditor.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/protocol.css') }}">
 {% endblock includes %}
 
 {% block content %}
-    <h1>Protocol Editor</h1>
+    <h1>Biological Protocol</h1>
     <button onclick="save_protocol()" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save protocol</button>
     <button class="btn btn-primary btn-file"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Open protocol<input id="open-protocol" type="file" accept=".json"></button>
     <button onclick="start_protocol()" class="btn btn-primary"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Start protocol</button>

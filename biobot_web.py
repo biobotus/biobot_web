@@ -215,11 +215,6 @@ def surveillance():
 def control():
     return render_template('control.html')
 
-@app.route('/protocol')
-@login_required
-def protocol():
-    return render_template('protocol.html')
-
 @app.route('/protocol_editor')
 @login_required
 def protocol_editor():

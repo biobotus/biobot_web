@@ -76,10 +76,9 @@
                     {{ format_sidebar('Home', 'home', 'home') }}
                     {{ format_sidebar('Surveillance', 'facetime-video', 'surveillance') }}
                     {{ format_sidebar('Manual Control', 'dashboard', 'control') }}
-                    {{ format_sidebar('Mapping', 'globe', 'mapping') }}
-                    {{ format_sidebar('Biological Protocol', 'tint', 'protocol') }}
-                    {{ format_sidebar('Protocol Editor', 'edit', 'protocol_editor') }}
-                    {{ format_sidebar('Deck Editor', 'th', 'deck_editor') }}
+                    {{ format_sidebar('Mapping', 'th', 'mapping') }}
+                    {{ format_sidebar('Biological Protocol', 'tint', 'protocol_editor') }}
+                    {{ format_sidebar('Deck Editor', 'edit', 'deck_editor') }}
                     {{ format_sidebar('Logs', 'search', 'logs') }}
                     {% if current_user.is_authenticated and current_user.is_admin() %}
                         {{ format_sidebar('Manage Users', 'tasks', 'manage_users') }}
