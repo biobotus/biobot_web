@@ -6,6 +6,7 @@ var open_protocol;
 window.onload = function() {
     setHeightSidebar();
     ros_init();
+    add_topic();
 
     open_protocol = $('#open-protocol')[0];
     open_protocol.addEventListener('change', open_protocol_file, false);
@@ -14,6 +15,24 @@ window.onload = function() {
     p_author = $('#protocol_author')[0];
     p_description = $('#protocol_description')[0];
 };
+
+function add_topic() {
+    start_protocol_topic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/Start_Protocol',
+        messageType: 'std_msgs/String'
+    });
+}
+
+function get_json_protocol(){
+    return JSON.stringify({
+        'name': p_name.value,
+        'author': p_author.value,
+        'description': p_description.value,
+        'refs': labware.getValue(),
+        'instructions': instructions.getValue()
+    });
+}
 
 JSONEditor.defaults.options = {
     ajax: true,
@@ -27,13 +46,7 @@ JSONEditor.defaults.options = {
 }
 
 function save_protocol() {
-    var protocol = JSON.stringify({
-        'name': p_name.value,
-        'author': p_author.value,
-        'description': p_description.value,
-        'refs': labware.getValue(),
-        'instructions': instructions.getValue()
-    });
+    var protocol = get_json_protocol();
 
     console.log(protocol);
 
@@ -104,4 +117,33 @@ instructions.on("change",  function() {
         rows[tmp].tab.style.color = "red";
     }
 });
+
+function start_protocol() {
+    var errors_labware = labware.validate();
+    var errors_protocol = instructions.validate();
+
+    if (errors_labware.length > 0 || errors_protocol.length > 0){
+        BootstrapDialog.alert({
+            title: 'Error',
+            message: 'Cannot start a protocol that contain errors',
+            type: BootstrapDialog.TYPE_DANGER
+        });
+    } else {
+        BootstrapDialog.confirm({
+            title: 'Start Protocol',
+            message: 'Are you sure you wish to start the current biological protocol?',
+            type: BootstrapDialog.TYPE_INFO,
+            btnOKLabel: 'Confirm',
+            callback: function(result){
+                if(result) {
+                    var protocol_msg = new ROSLIB.Message({
+                        data: get_json_protocol()
+                    });
+
+                    start_protocol_topic.publish(protocol_msg);
+                }
+            }
+        });
+    }
+}
 
