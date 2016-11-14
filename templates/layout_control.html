@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {# This template subdivides 'content' block into four
-   sub-content blocks (top, left, right and bottom):
+   sub-content blocks (top, left_top, right and left_bottom):
 
-   [    TOP     ]
-   [LEFT] [RIGHT]
-   [   BOTTOM   ]
+   [     TOP     ]
+   [LEFT_T][RIGHT]
+   [LEFT_B][RIGHT]
 #}
 
 {% block content %}
@@ -16,7 +16,10 @@
             <tr>
                 <td valign="top">
                     <div class="container-fluid row" style="min-width:375px">
-                        {% block content_left %}{% endblock %}
+                        <table>
+                            <tr>{% block content_left_top %}{% endblock %}</tr>
+                            <tr>{% block content_left_bottom %}{% endblock %}</tr>
+                        </table>
                     </div>
                 </td>
                 <td valign="top">
@@ -26,9 +29,6 @@
                 </td>
             </tr>
         </table>
-    </div>
-    <div class="container-fluid row">
-        {% block content_bottom %}{% endblock %}
     </div>
 {% endblock content %}
 

@@ -4,13 +4,13 @@ var new_step_rel;
 var sections = ['axis', 'sp', 'mp', 'gripper'];
 var visible_section = 'axis';
 var axis_mode = 'Relative Movement';
-var z_mode = 'Simple Pipette';
-var z_ids = {'Simple Pipette': 0, 'Multiple Pipette': 1, 'Gripper': 2};
+var z_mode = 'Single Pipette';
+var z_ids = {'Single Pipette': 0, 'Multiple Pipette': 1, 'Gripper': 2};
 
 // Variables used to display current position
 var cur_pos_ids = ['cur_x_mm', 'cur_y_mm', 'cur_z0_mm',
                    'cur_z1_mm', 'cur_z2_mm', 'cur_sp_ul',
-                   'cur_mp_ul'];
+                   'cur_mp_ul', 'cur_g_wr', 'cur_g_op'];
 var not_available = 'N/A';
 var cur_x_mm_str  = not_available;
 var cur_y_mm_str  = not_available;
@@ -19,6 +19,8 @@ var cur_z1_mm_str = not_available;
 var cur_z2_mm_str = not_available;
 var cur_sp_ul_str = not_available;
 var cur_mp_ul_str = not_available;
+var cur_g_wr_str = not_available;
+var cur_g_op_str = not_available;
 
 function show(section) {
     visible_section = section;
@@ -96,7 +98,7 @@ function move() {
 
         } else if (axis_mode == 'Absolute Position') {
             if (z_id != 0 || !$.isNumeric(x_step) || !$.isNumeric(y_step) || !$.isNumeric(z_step) || x_step < 0 || y_step < 0 || z_step < 0) {
-                print_warning('Absolute position only works with Simple Pipette and requires positive values in mm.');
+                print_warning('Absolute position only works with Single Pipette and requires positive values in mm.');
                 return
             }
 
@@ -189,33 +191,31 @@ function move() {
 
         var input_m0 = $('#input-gripper-wrist')[0];
         var input_op = $('#input-gripper-opening')[0];
-        var input_m0_val = input_m0.value;
-        var input_op_val = input_op.value;
 
-        if (!$.isNumeric(input_m0_val)) {
+        if (!$.isNumeric(input_m0.value)) {
             input_m0.value = '';
         } else {
+            var input_m0_val = parseFloat(input_m0.value);
             if (input_m0_val < -90) {
                 input_m0_val = -90;
-            } else if (input_m0_val > 0) {
-                input_m0_val = 0;
+            } else if (input_m0_val > 90) {
+                input_m0_val = 90;
             }
             input_m0.value = input_m0_val;
-            angle_dict[0] = parseFloat(input_m0_val);
+            angle_dict['wrist'] = input_m0_val;
         }
 
-        if (!$.isNumeric(input_op_val)) {
+        if (!$.isNumeric(input_op.value)) {
             input_op.value = '';
         } else {
+            var input_op_val = parseFloat(input_op.value);
             if (input_op_val < 0) {
                 input_op_val = 0;
             } else if (input_op_val > 100) {
                 input_op_val = 100;
             }
             input_op.value = input_op_val;
-            var input_m12 = 62*(1-input_op_val/100);
-            angle_dict[1] = input_m12;
-            angle_dict[2] = input_m12;
+            angle_dict['opening'] = input_op_val;
         }
 
         if (Object.keys(angle_dict).length != 0) {
@@ -233,8 +233,11 @@ function move() {
 }
 
 function print_warning(message) {
-    var div_warning  = $('#error-message')[0];
-    div_warning.innerHTML = '<div class="alert alert-danger alert-dismissible fade in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Error!</strong> '+message+'</div>'
+    BootstrapDialog.alert({
+        title: 'Error',
+        message: message,
+        type: BootstrapDialog.TYPE_DANGER
+    });
 }
 
 window.onload = function() {
@@ -306,7 +309,7 @@ function home(axis) {
 }
 
 function home_gripper() {
-    var step_dict = {'module_type': 'gripper', 'params': {'name': 'manip', 'args': {'0': -90, '1': 49.6, '2': 49.6}}}
+    var step_dict = {'module_type': 'gripper', 'params': {'name': 'manip', 'args': {'wrist': 90, 'opening': 0}}}
 
     var new_step_gripper = new ROSLIB.Message({
         data : JSON.stringify(step_dict)
@@ -326,6 +329,8 @@ function new_position (data) {
     cur_z2_mm_str = data[4].toFixed(3).toString() + mm;
     cur_sp_ul_str = data[5].toFixed(3).toString() + ul;
     cur_mp_ul_str = data[6].toFixed(3).toString() + ul;
+    cur_g_wr_str = data[7].toFixed(3).toString() + ' &ordm;';
+    cur_g_op_str = data[8].toFixed(3).toString() + ' %';
 
     update_position();
 }
