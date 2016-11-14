@@ -7,6 +7,8 @@
 
     <script>var ini_x = {{ini['x']}}, ini_y = {{ini['y']}};</script>
     <script src="{{ url_for('static', filename='js/validate.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap-select.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-select.min.css') }}">
 {% endblock includes %}
 
 {% block content %}
@@ -34,15 +36,9 @@
                 <td class="w150px">
                     <input type=text name="id" class="form-control" value="{{item.get('id', '')}}" maxlength="{{conf.limit_input_md}}">
                 </td>
-                {% if item['name'] == 'tip_holder' %}
-                    <td>
-                        <input type="radio" name="name" value="small_tip_holder" checked> Small Tip Holder<br>
-                        <input type="radio" name="name" value="medium_tip_holder"> Medium Tip Holder<br>
-                        <input type="radio" name="name" value="large_tip_holder"> Large Tip Holder
-                    </td>
-                {% else %}
-                    <td><input type="text" name="name" class="form-control" value="{{item['name']}}" readonly></td>
-                {% endif %}
+                <td>
+                    <select class="selectpicker show-tick" data-width="fit" data-size="5" name="name" data-default="{{item['name']}}"></select>
+                </td>
                 <td class="w150px"><div class="input-group">
                     <input type="text" id="valid_x" name="valid_x" class="form-control" value="{{item.get('valid_x', '')}}" readonly>
                     <span class="input-group-addon">mm</span>
@@ -90,6 +86,13 @@
         $(".btn").mouseup(function(){
             $(this).blur();
         })
+
+        // Configure item type select menu
+        var select = $('.selectpicker');
+        select.empty().append('{{labware_options}}');
+        select.selectpicker('refresh')
+        select.selectpicker('val', select.data('default'));
+        select.selectpicker('refresh')
     </script>
 {% endblock content %}
 

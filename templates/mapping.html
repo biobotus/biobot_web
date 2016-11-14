@@ -38,7 +38,7 @@
                 {% for item in from_editor %}
                     <tr>
                         <td>{{item['id']}}</td>
-                        <td>{{item['name']}}</td>
+                        <td>{{item['name'].replace('_', ' ').title()}}</td>
                         <td>{{item['row']}}</td>
                         <td>{{item['col']}}</td>
                         <td><button class="btn btn-default btn-xs" onclick="validate_item('{{item['uuid']}}')">Validate item</button></td>
@@ -66,7 +66,7 @@
                 {% for item in from_carto %}
                     <tr>
                         <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}
-                        <td>{{item['name']}}</td>
+                        <td>{{item['name'].replace('_', ' ').title()}}</td>
                         <td>{{item['carto_x']}}</td>
                         <td>{{item['carto_y']}}</td>
                         <td><button class="btn btn-default btn-xs" onclick="validate_item('{{item['uuid']}}')">Validate item</button></td>
@@ -101,7 +101,7 @@
                             <td></td>
                         {% endif %}
                         <td>{{item['id']}}</td>
-                        <td>{{item['name']}}</td>
+                        <td>{{item['name'].replace('_', ' ').title()}}</td>
                         <td>{{item['valid_x']}}</td>
                         <td>{{item['valid_y']}}</td>
                         <td>{{item['valid_z']}}</td>

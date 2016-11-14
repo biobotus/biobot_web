@@ -277,6 +277,12 @@ def mapping_modify(uid):
 def mapping_validate(uid):
     if request.method == 'GET':
         item = biobot.deck.find_one({'uuid': uid})
+        deck_cursor = biobot.labware.find({'type': {'$ne': 'Tool'}})
+        deck = sorted([item['name'] for item in deck_cursor])
+        options = "<option value={0}>{1}</option>"
+        all_options = [options.format(i, i.replace('_', ' ').title()) for i in deck]
+        labware_options = Markup(''.join(all_options))
+
         if item['source'] == 'deck_editor':
             ini = {'x': round(conf.deck_length/100*int(item['col'])+conf.deck_length/200, 3),
                    'y': round(conf.deck_width/26*(ord(item['row'])-65)+conf.deck_width/52, 3)}
@@ -284,7 +290,8 @@ def mapping_validate(uid):
             ini = {'x': round(item['carto_x'], 3),
                    'y': round(item['carto_y'], 3)}
 
-        return render_template('validate.html', item=item, ini=ini)
+        return render_template('validate.html', item=item, ini=ini, \
+                               labware_options=labware_options)
 
     else:
         biobot.deck.update_one({'uuid': uid}, {'$set': {'name': request.form['name'],
