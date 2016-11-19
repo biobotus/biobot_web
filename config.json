@@ -9,7 +9,6 @@
     "limit_input_md": 50,
     "limit_input_lg": 300,
     "limit_textarea_sm": 300,
-    "limit_textarea_lg": 10000,
     "max_actions_per_group": 10,
     "max_labware_items": 30,
     "max_protocol_steps": 50,

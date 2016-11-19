@@ -8,7 +8,7 @@ def get_schema(value, conf, biobot):
 
     if value == 'labware':
         labware_cursor = biobot.labware.find()
-        labware = sorted([item['name'] for item in labware_cursor])
+        labware = sorted([item['type'] for item in labware_cursor])
         schema = {
             'title': 'Labware',
             'type': 'array',
@@ -17,16 +17,16 @@ def get_schema(value, conf, biobot):
             'uniqueItems': True,
             'items': {
                 'title': 'Item',
-                'headerTemplate': '{{self.name}} - {{self.id}}',
+                'headerTemplate': '{{self.type}} - {{self.name}}',
                 'type': 'object',
                 'properties': {
-                    'name': {
-                        'title': 'Category',
+                    'type': {
+                        'title': 'Type',
                         'type': 'string',
                         'enum': labware,
                         'propertyOrder': 1
                     },
-                    'id': {
+                    'name': {
                         'title': 'Name',
                         'type': 'string',
                         'description': 'Name must not be empty',
@@ -408,8 +408,8 @@ def get_schema(value, conf, biobot):
         }
 
     elif value == 'deck':
-        deck_cursor = biobot.labware.find({'type': {'$ne': 'Tool'}})
-        deck = sorted([item['name'] for item in deck_cursor])
+        deck_cursor = biobot.labware.find({'class': {'$ne': 'Tool'}})
+        deck = sorted([item['type'] for item in deck_cursor])
 
         schema = {
             'title': 'Deck',
@@ -419,17 +419,17 @@ def get_schema(value, conf, biobot):
             'uniqueItems': True,
             'items': {
                 'title': 'Item',
-                'headerTemplate': '{{self.name}} ({{self.row}}{{self.col}})',
+                'headerTemplate': '{{self.type}} - {{self.name}} ({{self.row}}{{self.col}})',
                 'type': 'object',
                 'properties': {
-                    'name': {
+                    'type': {
                         'title': 'Type',
                         'type': 'string',
                         'enum': deck,
                         'propertyOrder': 1
                     },
-                    'id': {
-                        'title': 'ID/Name',
+                    'name': {
+                        'title': 'Name',
                         'type': 'string',
                         'description': 'Must not be empty',
                         'pattern': '^(?!\s*$).+',

@@ -126,12 +126,12 @@ def login():
         password = request.form['password']
         user = biobot.credentials.find_one({'username': username})
         if user and check_password(user['password'], password):
-            if user.get('active', False):
+            if user['active']:
                 login_user(User(username))
                 biobot.credentials.update_one(user, {'$set':
                                               {'last_login' : time.time()}})
-                if user['admin'] and \
-                   biobot.credentials.find_one({'active': {'$exists': False}}):
+
+                if user['admin'] and biobot.credentials.find_one({'active': False}):
                     flash('At least one user account has to be activated', 'info')
                     return redirect(url_for('manage_users'))
                 return redirect(next or url_for('home'))
@@ -177,6 +177,7 @@ def create_account():
 
         biobot.credentials.insert_one({'username': username,
                                      'password': hash_password(password),
+                                     'active': False,
                                      'admin': False})
         flash('Account created successfully', 'success')
         return redirect(url_for('login'))
@@ -240,16 +241,15 @@ def receive_deck(b64_deck):
         for i in range(len(deck)):
             deck[i]['source'] = 'deck_editor'
             deck[i]['uuid'] = uuid.uuid4().hex
+            deck[i]['validated'] = False
         biobot.deck.insert_many(deck)
     return redirect(url_for('mapping'))
 
 @app.route('/mapping')
 @login_required
 def mapping():
-    from_editor = list(biobot.deck.find({'source': 'deck_editor',
-                                         'validated': {'$exists': False}}))
-    from_carto = list(biobot.deck.find({'source': '3d_cartography',
-                                        'validated': {'$exists': False}}))
+    from_editor = list(biobot.deck.find({'source': 'deck_editor', 'validated': False}))
+    from_carto = list(biobot.deck.find({'source': '3d_cartography', 'validated': False}))
     validated = list(biobot.deck.find({'validated': True}))
 
     if from_editor or from_carto:
@@ -276,7 +276,7 @@ def mapping_delete(uid):
 @app.route('/mapping/modify/<uid>')
 @login_required
 def mapping_modify(uid):
-    biobot.deck.update_one({'uuid': uid}, {'$unset': {'validated': ''}})
+    biobot.deck.update_one({'uuid': uid}, {'$set': {'validated': False}})
     return redirect(url_for('mapping'))
 
 @app.route('/mapping/validate/<uid>', methods=['GET', 'POST'])
@@ -284,8 +284,8 @@ def mapping_modify(uid):
 def mapping_validate(uid):
     if request.method == 'GET':
         item = biobot.deck.find_one({'uuid': uid})
-        deck_cursor = biobot.labware.find({'type': {'$ne': 'Tool'}})
-        deck = sorted([item['name'] for item in deck_cursor])
+        deck_cursor = biobot.labware.find({'class': {'$ne': 'Tool'}})
+        deck = sorted([item['type'] for item in deck_cursor])
         options = "<option value={0}>{1}</option>"
         all_options = [options.format(i, i.replace('_', ' ').title()) for i in deck]
         labware_options = Markup(''.join(all_options))
@@ -301,14 +301,19 @@ def mapping_validate(uid):
                                labware_options=labware_options)
 
     else:
-        biobot.deck.update_one({'uuid': uid}, {'$set': {'name': request.form['name'],
-                                                        'id': request.form['id'],
-                                                        'valid_x': request.form['valid_x'],
-                                                        'valid_y': request.form['valid_y'],
-                                                        'valid_z': request.form['valid_z'],
-                                                        'validated': True}})
-
-        return redirect(url_for('mapping'))
+        if request.form['valid_x'] != '' and request.form['valid_y'] != '' and \
+                                             request.form['valid_z'] != '':
+            biobot.deck.update_one({'uuid': uid},
+                                   {'$set': {'type': request.form['type'],
+                                             'name': request.form['name'],
+                                             'valid_x': float(request.form['valid_x']),
+                                             'valid_y': float(request.form['valid_y']),
+                                             'valid_z': float(request.form['valid_z']),
+                                             'validated': True}})
+            return redirect(url_for('mapping'))
+        else:
+            flash('Cannot validate item with empty coordinates', 'danger')
+            return redirect(request.url)
 
 @app.route('/logs')
 def logs():
@@ -389,7 +394,7 @@ def manage_users():
 @admin_required
 def activate_user(username):
     user = biobot.credentials.find_one({'username': username})
-    if not user.get('active', False):
+    if not user['active']:
         biobot.credentials.update_one(user, {'$set': {'active': True}})
         flash("User {0} activated successfully".format(username), 'success')
     else:
@@ -451,31 +456,31 @@ def delete_user(username):
 @admin_required
 def manage_labware():
     if request.method == 'POST':
-        name = request.form['name'].lower().strip().replace(' ', '_')
+        item_type = request.form['type'].lower().strip().replace(' ', '_')
         description = request.form['description']
-        item_type = request.form['type']
-        item = biobot.labware.find_one({'name': name})
-        if not name:
-            flash('Empty labware item name is invalid', 'danger')
+        item_class = request.form['class']
+        item = biobot.labware.find_one({'type': item_type})
+        if not item_type:
+            flash('Empty labware item type is invalid', 'danger')
         elif item:
-            flash("Labware item {0} already exists".format(name), 'warning')
+            flash("Labware item {0} already exists".format(item_type), 'warning')
         else:
-            biobot.labware.insert_one({'name': name, 'description': description, 'type': item_type})
-            flash("Labware item {0} added successfully".format(name), 'success')
+            biobot.labware.insert_one({'type': item_type, 'description': description, 'class': item_class})
+            flash("Labware item {0} added successfully".format(item_type), 'success')
 
     labware_list = list(biobot.labware.find())
     return render_template('manage_labware.html', labware=labware_list)
 
-@app.route('/manage_labware/delete/<name>')
+@app.route('/manage_labware/delete/<item_type>')
 @login_required
 @admin_required
-def delete_labware(name):
-    item = biobot.labware.find_one({'name': name})
+def delete_labware(item_type):
+    item = biobot.labware.find_one({'type': item_type})
     if item:
         biobot.labware.delete_one(item)
-        flash("Item {0} deleted successfully".format(name), 'info')
+        flash("Item {0} deleted successfully".format(item_type), 'info')
     else:
-        flash("Cannot delete unknown item {0}".format(name), 'danger')
+        flash("Cannot delete unknown item {0}".format(item_type), 'danger')
 
     return redirect(url_for('manage_labware'))
 

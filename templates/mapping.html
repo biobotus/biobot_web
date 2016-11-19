@@ -26,7 +26,7 @@
         <table id="table_from_editor" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
             <thead>
                 <tr>
-                    <th>ID/Name</th>
+                    <th>Name</th>
                     <th>Type</th>
                     <th>Row</th>
                     <th>Column</th>
@@ -37,12 +37,12 @@
             <tbody>
                 {% for item in from_editor %}
                     <tr>
-                        <td>{{item['id']}}</td>
-                        <td>{{item['name'].replace('_', ' ').title()}}</td>
+                        <td>{{item['name']}}</td>
+                        <td>{{item['type'].replace('_', ' ').title()}}</td>
                         <td>{{item['row']}}</td>
                         <td>{{item['col']}}</td>
                         <td><button class="btn btn-default btn-xs" onclick="validate_item('{{item['uuid']}}')">Validate item</button></td>
-                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}','{{item['uuid']}}')">Delete item</button></td>
+                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['type']}}','{{item['uuid']}}')">Delete item</button></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -66,11 +66,11 @@
                 {% for item in from_carto %}
                     <tr>
                         <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}
-                        <td>{{item['name'].replace('_', ' ').title()}}</td>
+                        <td>{{item['type'].replace('_', ' ').title()}}</td>
                         <td>{{item['carto_x']}}</td>
                         <td>{{item['carto_y']}}</td>
                         <td><button class="btn btn-default btn-xs" onclick="validate_item('{{item['uuid']}}')">Validate item</button></td>
-                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}','{{item['uuid']}}')">Delete item</button></td>
+                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['type']}}','{{item['uuid']}}')">Delete item</button></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -83,7 +83,7 @@
             <thead>
                 <tr>
                     <th>Picture</th>
-                    <th>ID/Name</th>
+                    <th>Name</th>
                     <th>Type</th>
                     <th>X (mm)</th>
                     <th>Y (mm)</th>
@@ -100,13 +100,13 @@
                         {% else %}
                             <td></td>
                         {% endif %}
-                        <td>{{item['id']}}</td>
-                        <td>{{item['name'].replace('_', ' ').title()}}</td>
+                        <td>{{item['name']}}</td>
+                        <td>{{item['type'].replace('_', ' ').title()}}</td>
                         <td>{{item['valid_x']}}</td>
                         <td>{{item['valid_y']}}</td>
                         <td>{{item['valid_z']}}</td>
-                        <td><button class="btn btn-warning btn-xs" onclick="modify_item('{{item['name']}}','{{item['uuid']}}')">Modify item</button></td>
-                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}','{{item['uuid']}}')">Delete item</button></td>
+                        <td><button class="btn btn-warning btn-xs" onclick="modify_item('{{item['type']}}','{{item['uuid']}}')">Modify item</button></td>
+                        <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['type']}}','{{item['uuid']}}')">Delete item</button></td>
                     </tr>
                 {% endfor %}
             </tbody>
