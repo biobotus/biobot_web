@@ -251,6 +251,145 @@ def get_schema(value, conf, biobot):
             }
         }
 
+        picking_criterias = [
+            {
+                'title': 'Color',
+                'properties': {
+                    'category': {
+                        'title': 'Type of criteria',
+                        'type': 'string',
+                        'enum': ['color'],
+                        'propertyOrder': 1
+                    },
+                    'color': {
+                        'title': 'Color',
+                        'type': 'string',
+                        'format': 'color',
+                        'default': '#216bf5',
+                        'propertyOrder': 2
+                    },
+                }
+            },
+            {
+                'title': 'Size',
+                'properties': {
+                    'category': {
+                        'title': 'Type of criteria',
+                        'type': 'string',
+                        'enum': ['size'],
+                        'propertyOrder': 1
+                    },
+                    'minimum': {
+                        'title': 'Minimum size (mm²)',
+                        'type': 'number',
+                        'minimum': 0,
+                        'propertyOrder': 2
+                    },
+                    'maximum': {
+                        'title': 'Maximum size (mm²)',
+                        'type': 'number',
+                        'minimum': 0,
+                        'propertyOrder': 3
+                    }
+                }
+            },
+            {
+                'title': 'Segmentation',
+                'description': 'Default is false, even if criteria is not selected.',
+                'properties': {
+                    'category': {
+                        'title': 'Type of criteria',
+                        'type': 'string',
+                        'enum': ['segmentation'],
+                        'propertyOrder': 1
+                    },
+                    'segment': {
+                        'title': 'Segment adjascent colonies for picking?',
+                        'type': 'boolean',
+                        'default': False,
+                        'propertyOrder': 2
+                    }
+                }
+            }
+        ]
+
+        colony_picking = {
+            'action': {
+                'title': 'Action',
+                'type': 'string',
+                'enum': ['autopick'],
+                'propertyOrder': 1
+            },
+            'number': {
+                'title': 'Number of colonies to pick',
+                'type': 'integer',
+                'minimum': 0,
+                'default': 0,
+                'propertyOrder': 2
+            },
+            'criterias': {
+                'title': 'Criterias',
+                'type': 'array',
+                'format': 'tabs',
+                'minItems': 1,
+                'propertyOrder': 3,
+                'items': {
+                    'title': 'Criteria',
+                    'type': 'object',
+                    'headerTemplate': '{{self.category}}',
+                    'oneOf': picking_criterias
+                }
+            }
+        }
+
+        petri_analysis_groups = {
+            'title': 'Actions',
+            'type': 'array',
+            'format': 'tabs',
+            'maxItems': 2,
+            'items': {
+                'title': 'Action',
+                'type': 'object',
+                'headerTemplate': '{{i}} - {{self.action}}',
+                'oneOf': [
+                    {
+                        'title': 'Bacterial Colony Analysis',
+                        'properties': {
+                            'action': {
+                                'title': 'Action',
+                                'type': 'string',
+                                'enum': ['analyze']
+                            }
+                        },
+                    },
+                    {
+                        'title': 'Colony Picking',
+                        'properties': colony_picking
+                    }
+                ]
+            }
+        }
+
+        petri_analysis = {
+            'title': 'Petri Dish',
+            'properties': {
+                'op': {
+                    'title': 'Petri Dish Analysis',
+                    'type': 'string',
+                    'enum': ['petri_analysis'],
+                    'propertyOrder': 1
+                },
+                'size': {
+                    'title': 'Size',
+                    'type': 'string',
+                    'enum': ['Circle - 90 mm',
+                             'Circle - 35mm'],
+                    'propertyOrder': 2
+                },
+                'groups': petri_analysis_groups
+            }
+        }
+
         schema = {
             'title': 'Instructions',
             'type': 'array',
@@ -259,10 +398,11 @@ def get_schema(value, conf, biobot):
             'items': {
                 'title': 'Step',
                 'type': 'object',
-                'headerTemplate': 'Step {{i}} - {{self.op}}',
+                'headerTemplate': '{{i}} - {{self.op}}',
                 'anyOf': [
                     pipette_s,
-                    pipette_m
+                    pipette_m,
+                    petri_analysis
                 ]
             }
         }
