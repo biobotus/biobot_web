@@ -126,13 +126,20 @@ def login():
         password = request.form['password']
         user = biobot.credentials.find_one({'username': username})
         if user and check_password(user['password'], password):
-            login_user(User(username))
-            biobot.credentials.update_one(user, {'$set':
-                                          {'last_login' : time.time()}})
-            return redirect(next or url_for('home'))
+            if user.get('active', False):
+                login_user(User(username))
+                biobot.credentials.update_one(user, {'$set':
+                                              {'last_login' : time.time()}})
+                if user['admin'] and \
+                   biobot.credentials.find_one({'active': {'$exists': False}}):
+                    flash('At least one user account has to be activated', 'info')
+                    return redirect(url_for('manage_users'))
+                return redirect(next or url_for('home'))
+            else:
+                flash('Account not yet activated by an administrator', 'warning')
         else:
             flash('Invalid credentials', 'danger')
-            return render_template('login.html')
+        return render_template('login.html')
 
     else:
         return render_template('login.html')
@@ -376,6 +383,19 @@ def delete_logs(protocol):
 def manage_users():
     user_list = list(biobot.credentials.find())
     return render_template('manage_users.html', users=user_list)
+
+@app.route('/manage_users/activate/<username>')
+@login_required
+@admin_required
+def activate_user(username):
+    user = biobot.credentials.find_one({'username': username})
+    if not user.get('active', False):
+        biobot.credentials.update_one(user, {'$set': {'active': True}})
+        flash("User {0} activated successfully".format(username), 'success')
+    else:
+        flash("User {0} is already active".format(username), 'warning')
+
+    return redirect(url_for('manage_users'))
 
 @app.route('/manage_users/demote/<username>')
 @login_required
