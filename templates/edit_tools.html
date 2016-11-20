@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit Tools{% endblock title %}
+
+{% block includes %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jsoneditor.js') }}"></script>
+{% endblock includes %}
+
+{% block content %}
+    <h1>Edit Tools</h1>
+    <h4>This page allows editing the tools' position offset from the Single-Channel Pipette.<br>
+        It should only be used if the robot's physical configuration changes.</h4>
+    <button onclick="save_tools()" class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save Tools</button>
+
+    <div class="container-fluid row">
+        <div id="tools_editor"></div>
+    </div>
+    <script>
+        var initial_tools = {{tools}};
+    </script>
+    <script src="{{ url_for('static', filename='js/edit_tools.js') }}"></script>
+{% endblock content %}

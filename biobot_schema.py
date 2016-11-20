@@ -453,5 +453,45 @@ def get_schema(value, conf, biobot):
             }
         }
 
+    elif value == 'tools':
+        tools_cursor = biobot.labware.find({'class': 'Tool'})
+        tools = sorted([item['type'] for item in tools_cursor])
+        schema = {
+            'title': 'Tools configuration',
+            'type': 'array',
+            'format': 'tabs',
+            'minItems': conf.min_tools_count,
+            'maxItems': len(tools),
+            'uniqueItems': True,
+            'items': {
+                'title': 'Tool',
+                'headerTemplate': '{{self.type}}',
+                'type': 'object',
+                'properties': {
+                    'type': {
+                        'title': 'Type',
+                        'type': 'string',
+                        'enum': tools,
+                        'propertyOrder': 1
+                    },
+                    'offset_x': {
+                        'title': 'Offset X (mm)',
+                        'type': 'number',
+                        'propertyOrder': 2
+                    },
+                    'offset_y': {
+                        'title': 'Offset Y (mm)',
+                        'type': 'number',
+                        'propertyOrder': 3
+                    },
+                    'offset_z': {
+                        'title': 'Offset Z (mm)',
+                        'type': 'number',
+                        'propertyOrder': 4
+                    }
+                }
+            }
+        }
+
     return schema
 

@@ -60,11 +60,13 @@
                     <td>{{item['type']}}</td>
                     <td>{{item['description']}}</td>
                     <td>{{item['class']}}</td>
-                    <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['name']}}')">Delete item</button></td>
+                    <td><button class="btn btn-danger btn-xs" onclick="delete_item('{{item['type']}}')">Delete item</button></td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <a href="manage_labware/edit_tools"><button class="btn btn-warning">Edit tools</button></a>
 
     <script>
         $(document).ready(function() {

@@ -484,6 +484,23 @@ def delete_labware(item_type):
 
     return redirect(url_for('manage_labware'))
 
+@app.route('/manage_labware/edit_tools')
+@login_required
+@admin_required
+def edit_tools():
+    with open('tools_conf.json', 'r') as f:
+        tools = json.load(f)
+    return render_template('edit_tools.html', tools=Markup(tools))
+
+@app.route('/manage_labware/edit_tools/save/<b64_tools>')
+@login_required
+@admin_required
+def save_tools(b64_tools):
+    tools = ast.literal_eval(base64.b64decode(b64_tools).decode('utf-8'))
+    with open('tools_conf.json', 'w') as f:
+        json.dump(tools, f)
+    return redirect(url_for('edit_tools'))
+
 @app.route('/bad_permissions')
 def bad_permissions():
     return render_template('bad_permissions.html')

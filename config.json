@@ -14,6 +14,7 @@
     "max_protocol_steps": 50,
     "rosbridge_host": "10.43.156.10",
     "rosbridge_port": "9090",
+    "min_tools_count": 3,
     "webcam_host": "10.43.156.11",
     "webcam_port": "10088"
 }
