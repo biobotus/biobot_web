@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}ROS Status{% endblock title %}
+
+{% block includes %}
+    {{ super() }}
+
+    <script src="{{ url_for('static', filename='js/ros_status.js') }}"></script>
+{% endblock includes %}
+
+{% block content %}
+    <h1>BioBot ROS Status</h1>
+
+    {% if pid is none %}
+        <h4>ROS is not started</h4>
+        <button class="btn btn-success btn-lg" onclick="start_ros()">Start ROS</button>
+    {% else %}
+        <h4>Ros is started in process {{pid}}</h4>
+        <button class="btn btn-danger btn-lg" onclick="stop_ros()">Stop ROS</button>
+    {% endif %}
+{% endblock content %}
+

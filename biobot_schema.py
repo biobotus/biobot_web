@@ -251,6 +251,49 @@ def get_schema(value, conf, biobot):
             }
         }
 
+        clap = {
+            'title': 'Clap',
+            'type': 'object',
+            'properties': {}
+        }
+
+        gripper_groups = {
+            'title': 'Actions',
+            'type': 'array',
+            'format': 'tabs',
+            'items': {
+                'title': 'Action',
+                'type': 'object',
+                'headerTemplate': 'Action {{i}}',
+                'oneOf': [
+                    {
+                        'title': 'Clap',
+                        'properties': {
+                            'clap': {
+                                'title': 'Number of times to clap fingers',
+                                'type': 'integer',
+                                'minimum': 0,
+                                'default': 0,
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+        gripper = {
+            'title': 'Gripper',
+            'properties': {
+                'op': {
+                    'title': 'Gripper',
+                    'type': 'string',
+                    'enum': ['gripper'],
+                    'propertyOrder': 1
+                },
+                'groups': gripper_groups
+            }
+        }
+
         picking_criterias = [
             {
                 'title': 'Color',
@@ -402,6 +445,7 @@ def get_schema(value, conf, biobot):
                 'anyOf': [
                     pipette_s,
                     pipette_m,
+                    gripper,
                     petri_analysis
                 ]
             }

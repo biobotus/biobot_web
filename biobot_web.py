@@ -18,6 +18,8 @@ import hashlib
 import pandas as pd
 import pymongo
 import re
+import subprocess
+import threading
 import time
 import uuid
 
@@ -90,6 +92,9 @@ app = Flask(__name__)
 app.secret_key = uuid.uuid4().hex
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# ROS variable
+ros_pid = None
 
 # User class
 class User(UserMixin):
@@ -209,6 +214,40 @@ def change_password():
 
     else:
         return render_template('change_password.html')
+
+def ros_thread():
+    global ros_pid
+    try:
+        popen = subprocess.Popen(conf.roslaunch.split())
+        ros_pid = popen.pid
+        return_code = popen.wait()
+        if return_code:
+            print("subprocess.CalledProcessError: Command '{0}' returned non-zero exit status {1}".format(cmd, return_code))
+    finally:
+        ros_pid = None
+
+@app.route('/ros_status')
+@login_required
+@admin_required
+def ros_status():
+    print(ros_pid)
+    return render_template('ros_status.html', pid=ros_pid)
+
+@app.route('/ros_start')
+@login_required
+@admin_required
+def ros_start():
+    if not ros_pid:
+        threading.Thread(target=ros_thread).start()
+    return redirect(url_for('ros_status'))
+
+@app.route('/ros_stop')
+@login_required
+@admin_required
+def ros_stop():
+    if ros_pid:
+        subprocess.call("kill -15 {}".format(ros_pid), shell=True)
+    return redirect(url_for('ros_status'))
 
 @app.route('/home')
 def home():

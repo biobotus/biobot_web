@@ -44,7 +44,7 @@
                 {% if item['source'] == '3d_cartography' %}
                     <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
                 {% endif %}
-                <td class="w150px">
+                <td>
                     <input type=text name="name" class="form-control" value="{{item.get('name', '')}}" maxlength="{{conf.limit_input_md}}">
                 </td>
                 <td>

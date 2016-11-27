@@ -12,9 +12,10 @@
     "max_actions_per_group": 10,
     "max_labware_items": 30,
     "max_protocol_steps": 50,
+    "min_tools_count": 3,
     "rosbridge_host": "10.43.156.10",
     "rosbridge_port": "9090",
-    "min_tools_count": 3,
+    "roslaunch": "roslaunch ros_planner platform_launch.launch",
     "webcam_host": "10.43.156.11",
     "webcam_port": "10088"
 }
