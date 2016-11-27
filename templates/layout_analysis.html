@@ -11,7 +11,37 @@
                 </td>
                 <td valign="top">
                     <div class="container-fluid row">
-                        {% block content_right %}{% endblock %}
+                        <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                            <!-- Indicators -->
+                            <ol class="carousel-indicators">
+                                {% for i in range(pictures|length) %}
+                                    <li data-target="#myCarousel" data-slide-to="{{i}}" {% if i == 0 %}class="active"{% endif %}></li>
+                                {% endfor %}
+                            </ol>
+
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner" role="listbox">
+                                {% for pic in pictures %}
+                                    <div class="item {{'active' if pic == pictures[0]}}">
+                                        {{get_picture(protocol, 'images', pic['filename'], download=True,
+                                          tags='style="height:{0}px;width:{1}px"'.format(conf.cam_2d_height/conf.bca_factor,
+                                                                                         conf.cam_2d_width/conf.bca_factor))}}
+                                        <div class="carousel-caption">
+                                            <h3>{{pic['title']}}</h3>
+                                            <p>{{pic['description']}}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Left and right controls -->
+                            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                            </a>
+                            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                            </a>
+                        </div>
                     </div>
                 </td>
             </tr>

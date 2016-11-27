@@ -15,7 +15,7 @@
                 {% if step == current %}
                     <li><a href="#">Step {{step}}</a></li>
                 {% else %}
-                    <li><a href="/logs/{{protocol}}/colonies_analysis/step/{{step}}">Step {{step}}</a></li>
+                    <li><a href="/logs/{{protocol}}/bca/step/{{step}}">Step {{step}}</a></li>
                 {% endif %}
             {% endfor %}
         </ul>
@@ -32,11 +32,6 @@
     </div>
 {% endblock content_left %}
 
-{% block content_right %}
-    {{get_picture(protocol, 'images', 'test.jpg')}}
-
-{% endblock content_right %}
-
 {% block content_bottom %}
     <h3>Bacterial colonies characteristics</h3>
     <table id="table" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
@@ -47,9 +42,9 @@
                 <th>Area</th>
                 <th>Perimeter</th>
                 <th>Excentricity</th>
-                <th>Compactness</th>
                 <th>X coordinate</th>
                 <th>Y coordinate</th>
+                <th>Selected</th>
             </tr>
         </thead>
         <tbody>
@@ -60,9 +55,13 @@
                     <td>{{colony['area']}}</td>
                     <td>{{colony['perimeter']}}</td>
                     <td>{{colony['excentricity']}}</td>
-                    <td>{{colony['compactness']}}</td>
                     <td>{{colony['x']}}</td>
                     <td>{{colony['y']}}</td>
+                    {% if colony['selected'] %}
+                        <td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span style="display:none">Yes</span></td>
+                    {% else %}
+                        <td><span style="display:none">No</span></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
@@ -74,7 +73,13 @@
                 sPlaceHolder: "head:before",
                 aoColumns:[
                     null,
-                    {type: "select", values: {{colors|safe}}}
+                    {type: "select", values: {{colors|safe}}},
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    {type: "select", values: ["Yes", "No"]}
                 ]
             });
         });

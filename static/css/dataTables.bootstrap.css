@@ -193,5 +193,5 @@ div.table-responsive > div.dataTables_wrapper > div.row > div[class^="col-"]:las
 
 /* BioBot Edit */
 select.select_filter {
-    min-width: 70px;
+    min-width: 85px;
 }

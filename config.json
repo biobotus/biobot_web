@@ -1,6 +1,9 @@
 {
+    "cam_2d_height": 1944,
+    "cam_2d_width": 2592,
     "app_host": "0.0.0.0",
     "app_port": "5000",
+    "bca_factor": 6,
     "deck_width": 1000,
     "deck_length": 1500,
     "debug": false,

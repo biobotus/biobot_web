@@ -374,7 +374,7 @@ def log_highlights(protocol):
 
     return render_template('log_highlights.html', active='Highlights', \
                            protocol=protocol, json_protocol=json_protocol, \
-                           started=started, done=done)
+                           started=started, done=done, db=db)
 
 @app.route('/logs/<protocol>/steps')
 def log_steps(protocol):
@@ -383,16 +383,16 @@ def log_steps(protocol):
 
     db = client[protocol]
     steps = list(db.steps.find())
-    return render_template('log_steps.html', active='Steps', protocol=protocol, steps=steps)
+    return render_template('log_steps.html', active='Steps', protocol=protocol, steps=steps, db=db)
 
-@app.route('/logs/<protocol>/colonies_analysis')
-@app.route('/logs/<protocol>/colonies_analysis/step/<int:step>')
-def log_colonies_analysis(protocol, step=None):
+@app.route('/logs/<protocol>/bca')
+@app.route('/logs/<protocol>/bca/step/<int:step>')
+def log_bca(protocol, step=None):
     if not valid_protocol(protocol):
         return redirect(url_for('logs'))
 
     db = client[protocol]
-    colonies = list(db.colonies.find())
+    colonies = list(db.colonies.find({'operation': 'analysis'}))
 
     if not colonies:
         flash("No bacterial colonies analysis was found for protocol {0}".format(protocol), 'warning')
@@ -401,12 +401,55 @@ def log_colonies_analysis(protocol, step=None):
     df = pd.DataFrame(colonies)
     steps = sorted(df.step.unique())
     current_step = step if step else int(steps[0])
-    current_colonies = list(db.colonies.find({'step': current_step}))
+    current_colonies = list(db.colonies.find({'step': current_step, 'operation': 'analysis'}))
     colors = list(pd.DataFrame(current_colonies).color.unique())
 
-    return render_template('log_colonies_analysis.html', active='Colony', \
-                           protocol=protocol, steps=steps, current=current_step, \
-                           colonies=current_colonies, colors=colors)
+    pictures = [{
+                    'title': 'Raw',
+                    'description': 'Raw picture of the Petri dish',
+                    'filename': "raw_{}.jpg".format(current_step)
+                },{
+                    'title': 'Analysis',
+                    'description': 'Highlighted colonies have been characterized',
+                    'filename': "analysis_{}.jpg".format(current_step)
+                }]
+
+    return render_template('log_bca.html', active='BCA', protocol=protocol, \
+                           steps=steps, current=current_step, colonies=current_colonies, \
+                           colors=colors, db=db, pictures=pictures)
+
+@app.route('/logs/<protocol>/picking')
+@app.route('/logs/<protocol>/picking/step/<int:step>')
+def log_picking(protocol, step=None):
+    if not valid_protocol(protocol):
+        return redirect(url_for('logs'))
+
+    db = client[protocol]
+    colonies = list(db.colonies.find({'operation': 'picking'}))
+
+    if not colonies:
+        flash("No bacterial colonies picking was found for protocol {0}".format(protocol), 'warning')
+        return redirect("/logs/{0}".format(protocol))
+
+    df = pd.DataFrame(colonies)
+    steps = sorted(df.step.unique())
+    current_step = step if step else int(steps[0])
+    current_colonies = list(db.colonies.find({'step': current_step, 'operation': 'picking'}))
+    colors = list(pd.DataFrame(current_colonies).color.unique())
+
+    pictures = [{
+                    'title': 'Raw',
+                    'description': 'Raw picture of the Petri dish',
+                    'filename': "raw_{}.jpg".format(current_step)
+                },{
+                    'title': 'Colony Picking',
+                    'description': 'Highlighted colonies have been selected for picking',
+                    'filename': "picking_{}.jpg".format(current_step)
+                }]
+
+    return render_template('log_picking.html', active='BCA', protocol=protocol, \
+                           steps=steps, current=current_step, colonies=current_colonies, \
+                           colors=colors, db=db, pictures=pictures)
 
 @app.route('/logs/delete/<protocol>')
 @login_required
@@ -590,7 +633,7 @@ def format_sidebar(name, icon, url):
 
     return Markup(html)
 
-def get_picture(database, collection, filename, tags=""):
+def get_picture(database, collection, filename, tags="", download=False):
     db = client[database]
     coll = db[collection]
     image = coll.find_one({'filename': filename})
@@ -600,8 +643,11 @@ def get_picture(database, collection, filename, tags=""):
         img = fs.get(image_id).read()
         b64data = base64.b64encode(img).decode('utf-8')
         html = '<img src="data:image/jpeg;base64,{0}" {1}>'.format(b64data, tags)
+        if download:
+            html = '<a href="data:image/jpeg;base64,{0}" download="{1}">{2}</a>'.format(b64data, filename, html)
     else:
-        html = "Image {0} not found".format(filename)
+        html = '<img alt="Image {0} not found" {1}>'.format(filename, tags)
+
     return Markup(html)
 
 app.jinja_env.globals.update(conf=conf,
