@@ -15,10 +15,10 @@
             {% for step in steps %}
                 <tr>
                     <td>{{step['number']}}</td>
-                    <td>{{step['description']}}</td>
-                    <td>{{convert_ts(step['start'])}}</td>
+                    <td>{{step['description']|safe|nl2br}}</td>
+                    <td>{{convert_ts(step['start']) if 'start' in step else 'Not started'}}</td>
                     <td>{{convert_ts(step['end']) if 'end' in step else 'Not finished'}}</td>
-                    <td>{{"{0} seconds".format(step['end']-step['start']) if 'end' in step else 'In progress'}}</td>
+                    <td>{{"{0:.1f} seconds".format(step['end']-step['start']) if 'end' in step else 'In progress'}}</td>
                 </tr>
             {% endfor %}
         </tbody>

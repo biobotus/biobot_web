@@ -461,7 +461,7 @@ def delete_logs(protocol):
 
     stats = biobot.stats.delete_one({'id': protocol})
     client.drop_database(protocol)
-    flash("Entry{0} deleted successfully".format(protocol), 'info')
+    flash("Entry {0} deleted successfully".format(protocol), 'info')
     return redirect(url_for('logs'))
 
 @app.route('/manage_users')

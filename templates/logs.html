@@ -35,7 +35,7 @@
                     <td>{{stat['nb_steps']}}</td>
                     <td>{{convert_ts(stat['start'])}}</td>
                     <td>{{convert_ts(stat['end']) if 'end' in stat else 'Not finished'}}</td>
-                    <td>{{"{0} seconds".format(stat['end']-stat['start']) if 'end' in stat else 'In progress'}}</td>
+                    <td>{{"{0:.1f} seconds".format(stat['end']-stat['start']) if 'end' in stat else 'In progress'}}</td>
                     <td>{{stat['operator']}}</td>
                     {% if current_user.is_authenticated and current_user.is_admin() %}
                         <td><button class="btn btn-danger btn-xs" onclick="delete_log('{{stat['id']}}')">Delete log</button></td>
