@@ -107,9 +107,9 @@
                                 <p id="ros_label_closed" style="display:none"><span class="label label-warning full-width">CLOSED</span></p>
                             </h3></td>
                             <td align=center style="padding:5px">
-                                {% block footer %}
-                                    {# Overwrite to display anything in the footer #}
-                                {% endblock footer %}
+                                <h2>BioBot is currently <span id='biobot_status'>...</span></h2>
+                                <p id="pause" style="display:none"><button class="btn btn-default" onclick="pause(true)">Pause</button></p>
+                                <p id="resume" style="display:none"><button class="btn btn-default" onclick="pause(false)">Resume</button></p>
                             </td>
                             <td align=center style="width:400px; padding:5px">
                                 <a href="https://github.com/biobotus" target="_blank" class="navbar-btn btn-lg btn-default btn"><img src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" alt="Logo GitHub"> BioBot Open Platform Project - 2016</a>

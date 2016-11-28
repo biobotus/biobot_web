@@ -4,6 +4,20 @@ var step_done_topic;
 var error_topic;
 var ros_connection_error = false;
 
+function update_status(msg) {
+    document.getElementById('biobot_status').innerHTML = msg;
+    if (msg.startsWith('powered off')) {
+        document.getElementById('pause').style.display = 'none';
+        document.getElementById('resume').style.display = 'none';
+    } else if (msg.startsWith('paused')) {
+        document.getElementById('pause').style.display = 'none';
+        document.getElementById('resume').style.display = 'inline';
+    } else {
+        document.getElementById('pause').style.display = 'inline';
+        document.getElementById('resume').style.display = 'none';
+    }
+}
+
 function ros_init() {
     // Connecting to ROS
     ros = new ROSLIB.Ros();
@@ -16,6 +30,7 @@ function ros_init() {
         document.getElementById('ros_label_connected').style.display = 'none';
         document.getElementById('ros_label_closed').style.display = 'none';
         document.getElementById('ros_label_error').style.display = 'inline';
+        update_status('powered off');
     });
 
     // Find out exactly when we made a connection.
@@ -26,6 +41,7 @@ function ros_init() {
         document.getElementById('ros_label_connected').style.display = 'inline';
         document.getElementById('ros_label_closed').style.display = 'none';
         document.getElementById('ros_label_error').style.display = 'none';
+        update_status('connected');
     });
 
     ros.on('close', function() {
@@ -34,6 +50,7 @@ function ros_init() {
         document.getElementById('ros_label_connected').style.display = 'none';
         document.getElementById('ros_label_closed').style.display = 'none';
         document.getElementById('ros_label_error').style.display = 'none';
+        update_status('powered off');
 
         if (ros_connection_error) {
             document.getElementById('ros_label_error').style.display = 'inline';
@@ -71,6 +88,14 @@ function e_stop_send() {
     });
 }
 
+function pause(action) {
+    var message = new ROSLIB.Message({
+        data: action
+    });
+
+    pause_topic.publish(message)
+}
+
 function add_global_topic() {
     global_enable_topic = new ROSLIB.Topic({
         ros: ros,
@@ -90,6 +115,18 @@ function add_global_topic() {
         messageType: 'std_msgs/String'
     });
 
+    pause_topic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/Pause',
+        messageType: 'std_msgs/Bool'
+    });
+
+    status_topic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/BioBot_Status',
+        messageType: 'std_msgs/String'
+    });
+
     step_done_topic.subscribe(function(message) {
         if (!message.data)
             BootstrapDialog.show({
@@ -97,6 +134,10 @@ function add_global_topic() {
                 message: 'BioBot requires a manual restart.',
                 type: BootstrapDialog.TYPE_DANGER
             });
+    });
+
+    status_topic.subscribe(function(message) {
+        update_status(message.data);
     });
 }
 

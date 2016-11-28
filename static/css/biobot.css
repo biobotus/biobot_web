@@ -3,6 +3,10 @@ h1 {
     font-weight: bold;
 }
 
+h2 {
+    margin-top: 0px !important;
+}
+
 button.eStop {
     border: none;
     height: 111px;
