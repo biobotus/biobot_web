@@ -30,7 +30,8 @@ function get_json_protocol(){
         'author': p_author.value,
         'description': p_description.value,
         'refs': labware.getValue(),
-        'instructions': instructions.getValue()
+        'instructions': instructions.getValue(),
+        'operator': operator
     });
 }
 
