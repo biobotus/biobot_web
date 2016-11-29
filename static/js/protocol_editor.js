@@ -24,15 +24,31 @@ function add_topic() {
     });
 }
 
-function get_json_protocol(){
-    return JSON.stringify({
-        'name': p_name.value,
-        'author': p_author.value,
-        'description': p_description.value,
-        'refs': labware.getValue(),
-        'instructions': instructions.getValue(),
-        'operator': operator
+function get_json_protocol(refs){
+    var prot = {};
+    prot['name'] = p_name.value;
+    prot['author'] = p_author.value;
+    prot['description'] = p_description.value;
+    prot['instructions'] = instructions.getValue();
+    if (refs) {
+        prot['operator'] = operator;
+        prot['refs'] = get_labware_ajax();
+    }
+    return JSON.stringify(prot);
+}
+
+function get_labware_ajax() {
+    var ret;
+    $.ajax({
+        'type': 'GET',
+        'url': '/get/schema/labware',
+        async: false,
+        'success': function(labware){
+            ret = JSON.parse(labware);
+        }
     });
+
+    return ret;
 }
 
 JSONEditor.defaults.options = {
@@ -47,7 +63,7 @@ JSONEditor.defaults.options = {
 }
 
 function save_protocol() {
-    var protocol = get_json_protocol();
+    var protocol = get_json_protocol(false);
 
     console.log(protocol);
 
@@ -70,26 +86,11 @@ function open_protocol_file(e) {
         p_name.value = contents['name'];
         p_author.value = contents['author'];
         p_description.value = contents['description'];
-        labware.setValue(contents['refs']);
         instructions.setValue(contents['instructions']);
     };
     reader.readAsText(file);
     this.value = null;
 }
-
-var labware_holder = $("#labware_holder")[0];
-
-// Initialize the labware editor
-var labware = new JSONEditor(labware_holder, {schema: {$ref: "/get/schema/labware"}});
-
-// Wait for editor to be ready (required because Ajax is used)
-labware.on("ready",function() {
-    labware.validate();
-    $('.json-editor-btn-collapse').on("click", setHeightSidebar);
-});
-
-// Listen for changes
-labware.on("change", setHeightSidebar);
 
 var instructions_holder = $("#instructions_holder")[0];
 
@@ -120,10 +121,9 @@ instructions.on("change",  function() {
 });
 
 function start_protocol() {
-    var errors_labware = labware.validate();
     var errors_protocol = instructions.validate();
 
-    if (errors_labware.length > 0 || errors_protocol.length > 0){
+    if (errors_protocol.length > 0){
         BootstrapDialog.alert({
             title: 'Error',
             message: 'Cannot start a protocol that contain errors',
@@ -138,8 +138,10 @@ function start_protocol() {
             callback: function(result){
                 if(result) {
                     var protocol_msg = new ROSLIB.Message({
-                        data: get_json_protocol()
+                        data: get_json_protocol(true)
                     });
+
+                    console.log(protocol_msg.data)
 
                     start_protocol_topic.publish(protocol_msg);
                 }

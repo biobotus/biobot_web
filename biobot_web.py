@@ -22,6 +22,7 @@ import subprocess
 import threading
 import time
 import uuid
+import webcolors
 
 import biobot_schema
 
@@ -49,6 +50,24 @@ def valid_protocol(protocol):
     else:
         flash("Protocol {0} does not exist".format(protocol), 'warning')
         return False
+
+# Color functions used for BCA
+def closest_color(requested_color):
+    min_colors = {}
+    for key, name in webcolors.css21_hex_to_names.items():
+        r_c, g_c, b_c = webcolors.hex_to_rgb(key)
+        rd = (r_c - requested_colour[0]) ** 2
+        gd = (g_c - requested_colour[1]) ** 2
+        bd = (b_c - requested_colour[2]) ** 2
+        min_colours[(rd + gd + bd)] = name
+    return min_colours[min(min_colours.keys())]
+
+def get_color_name(requested_color):
+    try:
+        color_name = webcolors.rgb_to_name(requested_color)
+    except ValueError:
+        color_name = closest_color(requested_color)
+    return color_name
 
 # Load default configuration
 with open('config.json') as config:
@@ -265,7 +284,8 @@ def control():
 @app.route('/protocol_editor')
 @login_required
 def protocol_editor():
-    return render_template('protocol_editor.html')
+    labware = json.loads(get_schema('labware'))
+    return render_template('protocol_editor.html', labware=labware)
 
 @app.route('/deck_editor')
 @login_required
@@ -431,11 +451,13 @@ def log_picking(protocol, step=None):
         flash("No bacterial colonies picking was found for protocol {0}".format(protocol), 'warning')
         return redirect("/logs/{0}".format(protocol))
 
-    df = pd.DataFrame(colonies)
-    steps = sorted(df.step.unique())
+    steps = sorted(pd.DataFrame(colonies).step.unique())
     current_step = step if step else int(steps[0])
     current_colonies = list(db.colonies.find({'step': current_step, 'operation': 'picking'}))
-    colors = list(pd.DataFrame(current_colonies).color.unique())
+    df = pd.DataFrame(current_colonies)
+    df['color_text'] = df.color.apply(webcolors.hex_to_rgb).apply(get_color_name)
+    colors = list(df.color_text.unique())
+    current_colonies = [x.to_dict() for _, x in df.iterrows()]
 
     pictures = [{
                     'title': 'Raw',

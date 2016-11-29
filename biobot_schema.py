@@ -7,35 +7,7 @@ def get_schema(value, conf, biobot):
     schema = {}
 
     if value == 'labware':
-        labware_cursor = biobot.labware.find()
-        labware = sorted([item['type'] for item in labware_cursor])
-        schema = {
-            'title': 'Labware',
-            'type': 'array',
-            'format': 'tabs',
-            'maxItems': conf.max_labware_items,
-            'uniqueItems': True,
-            'items': {
-                'title': 'Item',
-                'headerTemplate': '{{self.type}} - {{self.name}}',
-                'type': 'object',
-                'properties': {
-                    'type': {
-                        'title': 'Type',
-                        'type': 'string',
-                        'enum': labware,
-                        'propertyOrder': 1
-                    },
-                    'name': {
-                        'title': 'Name',
-                        'type': 'string',
-                        'description': 'Name must not be empty',
-                        'pattern': '^(?!\s*$).+',
-                        'propertyOrder': 2
-                    }
-                }
-            }
-        }
+        schema = list(biobot.deck.find({'validated': True}, {'name': 1, 'type': 1, '_id': 0}))
 
     elif value == 'instructions':
         generated = 'This is automatically generated from the previous two fields'
@@ -363,19 +335,44 @@ def get_schema(value, conf, biobot):
                 'enum': ['autopick'],
                 'propertyOrder': 1
             },
+            'to_container': {
+                'title': 'To (container)',
+                'description': 'Must be a Multiwell Plate',
+                'type': 'string',
+                'pattern': '^(?!\s*$).+',
+                'propertyOrder': 2
+            },
+            'to_location': {
+                'title': 'To (location)',
+                'type': 'string',
+                'pattern': '^[A-Z]{1,2}[0-9]{1,2}$',
+                'description': pattern_description,
+                'propertyOrder': 3
+            },
+            'to': {
+                'title': 'To',
+                'type': 'string',
+                'description': generated,
+                'template': '{{f_con}}/{{f_loc}}',
+                'watch': {
+                    'f_con': 'id.to_container',
+                    'f_loc': 'id.to_location'
+                },
+                'propertyOrder': 4
+            },
             'number': {
                 'title': 'Number of colonies to pick',
                 'type': 'integer',
                 'minimum': 0,
                 'default': 0,
-                'propertyOrder': 2
+                'propertyOrder': 5
             },
             'criterias': {
                 'title': 'Criterias',
                 'type': 'array',
                 'format': 'tabs',
                 'minItems': 1,
-                'propertyOrder': 3,
+                'propertyOrder': 6,
                 'items': {
                     'title': 'Criteria',
                     'type': 'object',
@@ -393,6 +390,7 @@ def get_schema(value, conf, biobot):
             'items': {
                 'title': 'Action',
                 'type': 'object',
+                'id': 'id',
                 'headerTemplate': '{{i}} - {{self.action}}',
                 'oneOf': [
                     {
@@ -422,11 +420,9 @@ def get_schema(value, conf, biobot):
                     'enum': ['petri_analysis'],
                     'propertyOrder': 1
                 },
-                'size': {
-                    'title': 'Size',
+                'name': {
+                    'title': 'Petri Dish Name',
                     'type': 'string',
-                    'enum': ['Circle - 90 mm',
-                             'Circle - 35mm'],
                     'propertyOrder': 2
                 },
                 'groups': petri_analysis_groups

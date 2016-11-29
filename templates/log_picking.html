@@ -51,13 +51,13 @@
             {% for colony in colonies %}
                 <tr>
                     <td>{{colony['id']}}</td>
-                    <td>{{colony['color']}}</td>
+                    <td><span class="glyphicon glyphicon-stop" aria-hidden=true style="color:{{colony['color']}}"></span> {{colony['color_text']}}</td>
                     <td>{{colony['area']}}</td>
                     <td>{{colony['perimeter']}}</td>
                     <td>{{colony['excentricity']}}</td>
                     <td>{{colony['x']}}</td>
                     <td>{{colony['y']}}</td>
-                    {% if colony['selected'] %}
+                    {% if colony['selected'] == 1 %}
                         <td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span style="display:none">Yes</span></td>
                     {% else %}
                         <td><span style="display:none">No</span></td>

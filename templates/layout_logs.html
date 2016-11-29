@@ -30,9 +30,6 @@
             </div>
         </nav>
     </div>
-    <div class="container-fluid row" style="overflow:visible">
-        {% block content_main %}{% endblock content_main %}
-    </div>
 
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
@@ -43,5 +40,9 @@
             </div>
         {% endif %}
     {% endwith %}
+
+    <div class="container-fluid row" style="overflow:visible">
+        {% block content_main %}{% endblock content_main %}
+    </div>
 {% endblock content %}
 
