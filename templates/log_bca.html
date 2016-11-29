@@ -23,12 +23,12 @@
             {% for colony in colonies %}
                 <tr>
                     <td>{{colony['id']}}</td>
-                    <td>{{colony['color']}}</td>
-                    <td>{{colony['area']}}</td>
-                    <td>{{colony['perimeter']}}</td>
-                    <td>{{colony['excentricity']}}</td>
-                    <td>{{colony['x']}}</td>
-                    <td>{{colony['y']}}</td>
+                    <td><span class="glyphicon glyphicon-stop" aria-hidden=true style="color:{{colony['color']}}"></span> {{colony['color_text']}}</td>
+                    <td>{{"{0:.2f} px<sup>2</sup>".format(colony['area'])|safe}}</td>
+                    <td>{{"{0:.2f} px".format(colony['perimeter'])}}</td>
+                    <td>{{"{0:.2f}".format(colony['excentricity'])}}</td>
+                    <td>{{"{0:.2f} px".format(colony['y'])}}</td>
+                    <td>{{"{0:.2f} px".format(colony['x'])}}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -36,13 +36,16 @@
 
     <script>
         $(document).ready(function() {
-            $('#table').dataTable().columnFilter({
+            var table = $('#table').dataTable({
+                "lengthMenu": [[5, 25, 100, -1], [5, 25, 100, "All"]]
+            }).columnFilter({
                 sPlaceHolder: "head:before",
                 aoColumns:[
                     null,
                     {type: "select", values: {{colors|safe}}}
                 ]
             });
+            table.on('draw.dt', setHeightSidebar);
         });
     </script>
 {% endblock content_bottom %}
