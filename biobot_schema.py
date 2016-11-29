@@ -386,7 +386,6 @@ def get_schema(value, conf, biobot):
             'title': 'Actions',
             'type': 'array',
             'format': 'tabs',
-            'maxItems': 2,
             'items': {
                 'title': 'Action',
                 'type': 'object',

@@ -6,20 +6,7 @@
 {% endblock includes %}
 
 {% block content_left %}
-    <div class="btn-group">
-        <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Step {{current}} <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            {% for step in steps %}
-                {% if step == current %}
-                    <li><a href="#">Step {{step}}</a></li>
-                {% else %}
-                    <li><a href="/logs/{{protocol}}/bca/step/{{step}}">Step {{step}}</a></li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
+    {{super()}}
 
     <div style="margin-top:15px;margin-right:15px">
         <table class="table table-bordered">

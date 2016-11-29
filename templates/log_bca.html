@@ -5,23 +5,6 @@
     <script src="{{ url_for('static', filename='js/jquery.dataTables.columnFilter.js') }}"></script>
 {% endblock includes %}
 
-{% block content_left %}
-    <div class="btn-group">
-        <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Step {{current}} <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            {% for step in steps %}
-                {% if step == current %}
-                    <li><a href="#">Step {{step}}</a></li>
-                {% else %}
-                    <li><a href="/logs/{{protocol}}/bca/step/{{step}}">Step {{step}}</a></li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </div>
-{% endblock content_left %}
-
 {% block content_bottom %}
     <h3>Bacterial colonies characteristics</h3>
     <table id="table" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">

@@ -12,15 +12,19 @@
                         <a href="/logs/{{protocol}}"><button type="button" class="btn btn-default navbar-btn {{'active' if active == 'Highlights' else ''}}"><span class="glyphicon glyphicon-star" aria-hidden="true"></span> Highlights</button></a>
                         <a href="/logs/{{protocol}}/steps"><button type="button" class="btn btn-default navbar-btn {{'active' if active == 'Steps' else ''}}"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Steps</button></a>
 
-                        {% if db.colonies.find_one({'operation': 'analysis'}) %}
+                        {% if db.colonies.find_one() %}
                             <a style="color:inherit;text-decoration:inherit;" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                 <button class="dropdown dropdown-toggle btn btn-default navbar-btn {{'active' if active == 'BCA' else ''}}">
                                     <span class="glyphicon glyphicon-picture" aria-hidden="true"></span> Bacterial Colony Analysis <span class="caret"></span>
                                     <ul class="dropdown-menu">
-                                        <li><a href="/logs/{{protocol}}/bca"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Analysis</a></li>
-                                        {% if db.colonies.find_one({'operation': 'picking'}) %}
-                                            <li><a href="/logs/{{protocol}}/picking"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Picking</a></li>
+                                        {% if db.colonies.find_one({'operation': 'analysis'}) %}
+                                            <li><a href="/logs/{{protocol}}/bca"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Analysis</a></li>
                                         {% endif %}
+                                        {% for pick in db.colonies.distinct('operation')|sort %}
+                                            {% if pick.startswith('picking') %}
+                                                <li><a href="/logs/{{protocol}}/picking/{{pick}}"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{pick.replace('_', ' ').title()}}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
                                     </ul>
                                 </button>
                             </a>

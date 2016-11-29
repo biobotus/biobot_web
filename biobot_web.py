@@ -415,45 +415,15 @@ def log_bca(protocol, step=None):
     colonies = list(db.colonies.find({'operation': 'analysis'}))
 
     if not colonies:
-        flash("No bacterial colonies analysis was found for protocol {0}".format(protocol), 'warning')
+        flash("No bacterial colonies was found for protocol {0}".format(protocol), 'warning')
         return redirect("/logs/{0}".format(protocol))
 
     df = pd.DataFrame(colonies)
     steps = sorted(df.step.unique())
-    current_step = step if step else int(steps[0])
-    current_colonies = list(db.colonies.find({'step': current_step, 'operation': 'analysis'}))
-    colors = list(pd.DataFrame(current_colonies).color.unique())
+    if not step:
+        return redirect("{0}/step/{1}".format(request.url, steps[0]))
 
-    pictures = [{
-                    'title': 'Raw',
-                    'description': 'Raw picture of the Petri dish',
-                    'filename': "raw_{}.jpg".format(current_step)
-                },{
-                    'title': 'Analysis',
-                    'description': 'Highlighted colonies have been characterized',
-                    'filename': "analysis_{}.jpg".format(current_step)
-                }]
-
-    return render_template('log_bca.html', active='BCA', protocol=protocol, \
-                           steps=steps, current=current_step, colonies=current_colonies, \
-                           colors=colors, db=db, pictures=pictures)
-
-@app.route('/logs/<protocol>/picking')
-@app.route('/logs/<protocol>/picking/step/<int:step>')
-def log_picking(protocol, step=None):
-    if not valid_protocol(protocol):
-        return redirect(url_for('logs'))
-
-    db = client[protocol]
-    colonies = list(db.colonies.find({'operation': 'picking'}))
-
-    if not colonies:
-        flash("No bacterial colonies picking was found for protocol {0}".format(protocol), 'warning')
-        return redirect("/logs/{0}".format(protocol))
-
-    steps = sorted(pd.DataFrame(colonies).step.unique())
-    current_step = step if step else int(steps[0])
-    current_colonies = list(db.colonies.find({'step': current_step, 'operation': 'picking'}))
+    current_colonies = list(db.colonies.find({'step': step, 'operation': 'analysis'}))
     df = pd.DataFrame(current_colonies)
     df['color_text'] = df.color.apply(webcolors.hex_to_rgb).apply(get_color_name)
     colors = list(df.color_text.unique())
@@ -462,16 +432,53 @@ def log_picking(protocol, step=None):
     pictures = [{
                     'title': 'Raw',
                     'description': 'Raw picture of the Petri dish',
-                    'filename': "raw_{}.jpg".format(current_step)
+                    'filename': "raw_{}.jpg".format(step)
+                },{
+                    'title': 'Analysis',
+                    'description': 'Highlighted colonies have been characterized',
+                    'filename': "analysis_{}.jpg".format(step)
+                }]
+
+    return render_template('log_bca.html', active='BCA', protocol=protocol, \
+                           steps=steps, current=step, colonies=current_colonies, \
+                           colors=colors, db=db, pictures=pictures)
+
+@app.route('/logs/<protocol>/picking/<pick_num>')
+@app.route('/logs/<protocol>/picking/<pick_num>/step/<int:step>')
+def log_picking(protocol, pick_num, step=None):
+    if not valid_protocol(protocol):
+        return redirect(url_for('logs'))
+
+    db = client[protocol]
+    colonies = list(db.colonies.find({'operation': pick_num}))
+
+    if not colonies:
+        flash("No bacterial colonies was found for protocol {0}".format(protocol), 'warning')
+        return redirect("/logs/{0}".format(protocol))
+
+    steps = sorted(pd.DataFrame(colonies).step.unique())
+    if not step:
+        return redirect("{0}/step/{1}".format(request.url, steps[0]))
+
+    current_colonies = list(db.colonies.find({'step': step, 'operation': pick_num}))
+    df = pd.DataFrame(current_colonies)
+    df['color_text'] = df.color.apply(webcolors.hex_to_rgb).apply(get_color_name)
+    colors = list(df.color_text.unique())
+    current_colonies = [x.to_dict() for _, x in df.iterrows()]
+
+    pictures = [{
+                    'title': 'Raw',
+                    'description': 'Raw picture of the Petri dish',
+                    'filename': "raw_{}.jpg".format(step)
                 },{
                     'title': 'Colony Picking',
                     'description': 'Highlighted colonies have been selected for picking',
-                    'filename': "picking_{}.jpg".format(current_step)
+                    'filename': "{}_{}.jpg".format(pick_num, step)
                 }]
 
     return render_template('log_picking.html', active='BCA', protocol=protocol, \
-                           steps=steps, current=current_step, colonies=current_colonies, \
-                           colors=colors, db=db, pictures=pictures)
+                           steps=steps, current=step, colonies=current_colonies, \
+                           pick_num=pick_num, colors=colors, db=db, pictures=pictures)
 
 @app.route('/logs/delete/<protocol>')
 @login_required

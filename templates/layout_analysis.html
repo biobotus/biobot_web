@@ -6,7 +6,22 @@
             <tr>
                 <td valign="top">
                     <div class="container-fluid row" style="min-width:200px">
-                        {% block content_left %}{% endblock %}
+                        {% block content_left %}
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Step {{current}} <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for step in steps %}
+                                        {% if step == current %}
+                                            <li><a href="#">Step {{step}}</a></li>
+                                        {% else %}
+                                            <li><a href="{{'{}/{}'.format('/'.join(request.url.split('/')[:-1]), step)}}">Step {{step}}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endblock %}
                     </div>
                 </td>
                 <td valign="top">
