@@ -19,6 +19,7 @@
                     <button type="button" id="show-sp-btn" class="btn btn-default navbar-btn" onclick="show('sp')">Single Pipette</button>
                     <button type="button" id="show-mp-btn" class="btn btn-default navbar-btn" onclick="show('mp')">Multiple Pipette</button>
                     <button type="button" id="show-gripper-btn" class="btn btn-default navbar-btn" onclick="show('gripper')">Gripper</button>
+                    <button type="button" id="show-tac-btn" class="btn btn-default navbar-btn" onclick="show('tac')">TAC</button>
                 </ul>
             </div>
         </div>
@@ -114,76 +115,163 @@
                 <input type="text" id="input-gripper-opening" class="form-control" placeholder="0% to 100%" maxlength="{{conf.limit_input_sm}}">
             </div>
         </div>
+
+        {# TAC Manual Control Tab #}
+        <div id="tac-control" style="display:none">
+            <h3>TAC Operation Parameters</h3>
+
+            {# User input fields #}
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:151px">Target Temperature</span>
+                <input type="text" id="input-tac-temp" class="form-control" placeholder="2&ordm;C to 55&ordm;C" maxlength="{{conf.limit_input_sm}}">
+            </div>
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:151px">Target Turbidity</span>
+                <input type="text" id="input-tac-turb" class="form-control" placeholder="0% to 100%" maxlength="{{conf.limit_input_sm}}">
+            </div>
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:151px">Refresh Rate</span>
+                <input type="text" id="input-tac-rate" class="form-control" placeholder="0.1s to 10s" maxlength="{{conf.limit_input_sm}}">
+            </div>
+            <div class="input-group form-group" style="width:260px">
+                <span class="input-group-addon" style="width:151px">Motor Speed</span>
+                <input type="text" id="input-tac-motor" class="form-control" placeholder="0% to 100%" maxlength="{{conf.limit_input_sm}}">
+            </div>
+        </div>
     </div>
 {% endblock content_left_top %}
 
 {% block content_right %}
-    <h3>Current Location</h3>
-    <table class="table table-striped table-bordered">
-        <tbody>
-            <tr>
-                <td>X Axis</td>
-                <td id="cur_x_mm"></td>
-            </tr>
-            <tr>
-                <td>Y Axis</td>
-                <td id="cur_y_mm"></td>
-            </tr>
-            <tr>
-                <td>Z0 Axis</td>
-                <td id="cur_z0_mm"></td>
-            </tr>
-            <tr>
-                <td>Z1 Axis</td>
-                <td id="cur_z1_mm"></td>
-            </tr>
-            <tr>
-                <td>Z2 Axis</td>
-                <td id="cur_z2_mm"></td>
-            </tr>
-            <tr>
-                <td>Single Pipette</td>
-                <td id="cur_sp_ul"></td>
-            </tr>
-            <tr>
-                <td>Multiple Pippete</td>
-                <td id="cur_mp_ul"></td>
-            </tr>
-            <tr>
-                <td>Gripper Wrist</td>
-                <td id="cur_g_wr"></td>
-            </tr>
-            <tr>
-                <td>Gripper Opening</td>
-                <td id="cur_g_op"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="platform">
+        <h3>Current Location</h3>
+        <table class="table table-striped table-bordered">
+            <tbody>
+                <tr>
+                    <td>X Axis</td>
+                    <td id="cur_x_mm"></td>
+                </tr>
+                <tr>
+                    <td>Y Axis</td>
+                    <td id="cur_y_mm"></td>
+                </tr>
+                <tr>
+                    <td>Z0 Axis</td>
+                    <td id="cur_z0_mm"></td>
+                </tr>
+                <tr>
+                    <td>Z1 Axis</td>
+                    <td id="cur_z1_mm"></td>
+                </tr>
+                <tr>
+                    <td>Z2 Axis</td>
+                    <td id="cur_z2_mm"></td>
+                </tr>
+                <tr>
+                    <td>Single Pipette</td>
+                    <td id="cur_sp_ul"></td>
+                </tr>
+                <tr>
+                    <td>Multiple Pippete</td>
+                    <td id="cur_mp_ul"></td>
+                </tr>
+                <tr>
+                    <td>Gripper Wrist</td>
+                    <td id="cur_g_wr"></td>
+                </tr>
+                <tr>
+                    <td>Gripper Opening</td>
+                    <td id="cur_g_op"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="module" style="display:none">
+        <h3>Current TAC Status</h3>
+        <table class="table table-striped table-bordered">
+            <tbody>
+                <tr>
+                    <td>Target Temperature</td>
+                    <td id="tac-param-temp">N/A</td>
+                </tr>
+                <tr>
+                    <td>Target Turbidity</td>
+                    <td id="tac-param-turb">N/A</td>
+                </tr>
+                <tr>
+                    <td>Refresh Rate</td>
+                    <td id="tac-param-rate">N/A</td>
+                </tr>
+                <tr>
+                    <td>Motor Speed</td>
+                    <td id="tac-param-motor">N/A</td>
+                </tr>
+                <tr>
+                    <td>Turbidity calibration : 0%</td>
+                    <td id="cur_turb_0">N/A</td>
+                </tr>
+                <tr>
+                    <td>Turbidity calibration : 100%</td>
+                    <td id="cur_turb_100">N/A</td>
+                </tr>
+                <tr>
+                    <td>Temperature</td>
+                    <td id="cur_tac_temp">N/A</td>
+                </tr>
+                <tr>
+                    <td>Turbidity</td>
+                    <td id="cur_tac_turb">N/A</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock content_right %}
 
 {% block content_left_bottom %}
-    {# Move button and warning message #}
-    <button type="button" id="move-btn" class="btn btn-success btn-lg navbar-btn active" onclick="move()">
-        <strong>Move <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></strong>
-    </button>
-
-    <br>
-
-    {# Home buttons #}
-    <div class="btn-group">
-        <button type="button" class="btn btn-primary" onclick="home(['XY', 'Z', 'SP', 'MP'{#, 'G'#}])">
-            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Homing
+    <div class="platform">
+        {# Move button #}
+        <button type="button" id="move-btn" class="btn btn-success btn-lg navbar-btn" onclick="move()">
+            <strong>Move <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></strong>
         </button>
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" style="position:relative;margin-top:36px;margin-left:-107px">
-            <li onclick="home(['XY'])"><a href="#">XY Axis</a></li>
-            <li onclick="home(['Z'])"><a href="#">Z Axis</a></li>
-            <li onclick="home(['SP'])"><a href="#">Single Pipette</a></li>
-            <li onclick="home(['MP'])"><a href="#">Multiple Pipette</a></li>
-            <li onclick="home(['G'])"><a href="#">Gripper</a></li>
-        </ul>
+
+        <br>
+
+        {# Home buttons #}
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" onclick="home(['XY', 'Z', 'SP', 'MP'{#, 'G'#}])">
+                <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Homing
+            </button>
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" style="position:relative;margin-top:36px;margin-left:-107px">
+                <li onclick="home(['XY'])"><a href="#">XY Axis</a></li>
+                <li onclick="home(['Z'])"><a href="#">Z Axis</a></li>
+                <li onclick="home(['SP'])"><a href="#">Single Pipette</a></li>
+                <li onclick="home(['MP'])"><a href="#">Multiple Pipette</a></li>
+                <li onclick="home(['G'])"><a href="#">Gripper</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="module">
+        {# Send parameters, start calibration and start TAC buttons #}
+        <div>
+            <button type="button" class="btn btn-primary navbar-btn" onclick="send_tac('config')">
+                <strong>Send Parameters <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></strong>
+            </button>
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary navbar-btn" onclick="send_tac('calibration_0')">
+                <strong>Start Calibration <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></strong>
+            </button>
+        </div>
+        <div id="start-tac" style="display:none;">
+            <button type="button" class="btn btn-success btn-lg navbar-btn" onclick="send_tac('start')">
+                <strong>Start TAC <span class="glyphicon glyphicon-play" aria-hidden="true"></span></strong>
+            </button>
+            <button type="button" class="btn btn-danger btn-lg navbar-btn" onclick="send_tac('stop')">
+                <strong>Stop TAC <span class="glyphicon glyphicon-stop" aria-hidden="true"></span></strong>
+            </button>
+        </div>
     </div>
 {% endblock content_left_bottom %}
 

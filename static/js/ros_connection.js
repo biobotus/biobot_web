@@ -5,16 +5,16 @@ var error_topic;
 var ros_connection_error = false;
 
 function update_status(msg) {
-    document.getElementById('biobot_status').innerHTML = msg;
+    $('#biobot_status')[0].innerHTML = msg;
     if (msg.startsWith('powered off')) {
-        document.getElementById('pause').style.display = 'none';
-        document.getElementById('resume').style.display = 'none';
+        $('#pause').hide()
+        $('#resume').hide()
     } else if (msg.startsWith('paused')) {
-        document.getElementById('pause').style.display = 'none';
-        document.getElementById('resume').style.display = 'inline';
+        $('#pause').hide()
+        $('#resume').show()
     } else {
-        document.getElementById('pause').style.display = 'inline';
-        document.getElementById('resume').style.display = 'none';
+        $('#pause').show()
+        $('#resume').hide()
     }
 }
 
@@ -26,10 +26,10 @@ function ros_init() {
     ros.on('error', function(error) {
         console.log(error);
         ros_connection_error = true;
-        document.getElementById('ros_label_connecting').style.display = 'none';
-        document.getElementById('ros_label_connected').style.display = 'none';
-        document.getElementById('ros_label_closed').style.display = 'none';
-        document.getElementById('ros_label_error').style.display = 'inline';
+        $('#ros_label_connecting').hide()
+        $('#ros_label_connected').hide()
+        $('#ros_label_closed').hide()
+        $('#ros_label_error').show()
         update_status('powered off');
     });
 
@@ -37,25 +37,25 @@ function ros_init() {
     ros.on('connection', function() {
         console.log('Connection made!');
         ros_connection_error = false;
-        document.getElementById('ros_label_connecting').style.display = 'none';
-        document.getElementById('ros_label_connected').style.display = 'inline';
-        document.getElementById('ros_label_closed').style.display = 'none';
-        document.getElementById('ros_label_error').style.display = 'none';
+        $('#ros_label_connecting').hide()
+        $('#ros_label_connected').show()
+        $('#ros_label_closed').hide()
+        $('#ros_label_error').hide()
         update_status('connected');
     });
 
     ros.on('close', function() {
         console.log('Connection closed.');
-        document.getElementById('ros_label_connecting').style.display = 'none';
-        document.getElementById('ros_label_connected').style.display = 'none';
-        document.getElementById('ros_label_closed').style.display = 'none';
-        document.getElementById('ros_label_error').style.display = 'none';
+        $('#ros_label_connecting').hide()
+        $('#ros_label_connected').hide()
+        $('#ros_label_closed').hide()
+        $('#ros_label_error').hide()
         update_status('powered off');
 
         if (ros_connection_error) {
-            document.getElementById('ros_label_error').style.display = 'inline';
+            $('#ros_label_error').show()
         } else {
-            document.getElementById('ros_label_closed').style.display = 'inline';
+            $('#ros_label_closed').show()
         }
     });
 

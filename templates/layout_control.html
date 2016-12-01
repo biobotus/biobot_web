@@ -7,6 +7,11 @@
    [LEFT_B][RIGHT]
 #}
 
+{% block includes %}
+    {{super()}}
+    <style>h3 {margin-top: 0px;}</style>
+{% endblock includes %}
+
 {% block content %}
     <div class="container-fluid row">
         {% block content_top %}{% endblock %}
@@ -15,7 +20,7 @@
         <table>
             <tr>
                 <td valign="top">
-                    <div class="container-fluid row" style="min-width:375px">
+                    <div class="container-fluid row" style="min-width:400px">
                         <table>
                             <tr>{% block content_left_top %}{% endblock %}</tr>
                             <tr>{% block content_left_bottom %}{% endblock %}</tr>

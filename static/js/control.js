@@ -1,11 +1,12 @@
 var listener;
 var new_step;
 var new_step_rel;
-var sections = ['axis', 'sp', 'mp', 'gripper'];
+var sections = ['axis', 'sp', 'mp', 'gripper', 'tac'];
 var visible_section = 'axis';
 var axis_mode = 'Relative Movement';
 var z_mode = 'Single Pipette';
 var z_ids = {'Single Pipette': 0, 'Multiple Pipette': 1, 'Gripper': 2};
+var tac_calib_cb = false;
 
 // Variables used to display current position
 var cur_pos_ids = ['cur_x_mm', 'cur_y_mm', 'cur_z0_mm',
@@ -35,6 +36,14 @@ function show(section) {
             $('#show-'+sec+'-btn').removeClass('active');
             $('#'+sec+'-control').hide();
         }
+    }
+
+    if (section == 'tac') {
+        $('.platform').hide();
+        $('.module').show();
+    } else {
+        $('.platform').show();
+        $('.module').hide();
     }
 }
 
@@ -232,6 +241,114 @@ function move() {
     }
 }
 
+function send_tac(action) {
+    var params;
+
+    if (action == 'config') {
+        // Send Parameters to TAC
+        var input_temp  = $('#input-tac-temp')[0];
+        var input_turb  = $('#input-tac-turb')[0];
+        var input_rate  = $('#input-tac-rate')[0];
+        var input_motor = $('#input-tac-motor')[0];
+
+        var temp_val = input_temp.value;
+        var turb_val = input_turb.value;
+        var rate_val = input_rate.value;
+        var motor_val = input_motor.value;
+
+        if (!$.isNumeric(temp_val) || !$.isNumeric(turb_val) || !$.isNumeric(rate_val) || !$.isNumeric(motor_val)) {
+            print_warning('TAC Parameter require numeric inputs.');
+            return
+        }
+
+        temp_val = parseFloat(temp_val)
+        turb_val = parseFloat(turb_val)
+        rate_val = parseFloat(rate_val)
+        motor_val = parseFloat(motor_val)
+
+        if (temp_val < 2 || temp_val > 55 || turb_val < 0 || turb_val > 100 || rate_val < 0.1 || rate_val > 10 || motor_val < 0 || motor_val > 100) {
+            print_warning('At least one TAC parameter is out of limits.');
+            return
+        }
+
+        params = {'target_temperature': temp_val, 'target_turbidity': turb_val, 'refresh_rate': rate_val, 'motor_speed': motor_val};
+
+    } else if (action.startsWith('calibration')) {
+        params = parseInt(action.split('_')[1])
+        if (tac_calib_cb) {
+            tac_calib_cb = false;
+            action = 'calibration';
+        } else {
+            var msg;
+            if (params == 100)
+                msg = 'Place the transparent item (turbidity 100%) in the TAC and press \'Confirm\'.';
+            else if (params == 0)
+                msg = 'Place the opaque item (turbidity 0%) in the TAC and press \'Confirm\'.';
+
+            BootstrapDialog.confirm({
+                title: 'TAC Calibration',
+                message: msg,
+                type: BootstrapDialog.TYPE_PRIMARY,
+                btnOKLabel: 'Confirm',
+                callback: function(result){
+                    if(result) {
+                        tac_calib_cb = true;
+                        send_tac(action);
+                    }
+                }
+            });
+
+            return;
+        }
+    } else if (action == 'start') {
+        params = true;
+    } else if (action == 'stop') {
+        action = 'start';
+        params = false;
+    } else {
+        print_warning('Invalid TAC action received.');
+        return;
+    }
+
+    var message = {'action': action, 'params': params, 'use_db': false};
+
+    var tac_msg = new ROSLIB.Message({
+        data : JSON.stringify(message)
+    });
+
+    console.log(tac_msg.data);
+
+    tac_topic.publish(tac_msg);
+    return;
+}
+
+function receive_tac(message) {
+    if (message['action'] == 'calibration_result') {
+        if ('turb_0' in message['params']) {
+            $('#cur_turb_0')[0].innerHTML = message['params']['turb_0'];
+            send_tac('calibration_100');
+        } else if ('turb_100' in message['params']) {
+            $('#cur_turb_100')[0].innerHTML = message['params']['turb_100'];
+            $('#start-tac').show();
+        } else {
+            print_warning('Invalid calibration result received: ' + message['params']);
+        }
+    } else if (message['action'] == 'actual_values') {
+        var values = message['params'];
+        $('#tac-param-temp')[0].innerHTML = values['target_temperature'] + '&ordm;C';
+        $('#tac-param-turb')[0].innerHTML = values['target_turbidity'] + '%';
+        $('#tac-param-rate')[0].innerHTML = values['refresh_rate'] + 's';
+        $('#tac-param-motor')[0].innerHTML = values['motor_speed'] + '%';
+        $('#cur_turb_0')[0].innerHTML = values['turb_0'];
+        $('#cur_turb_100')[0].innerHTML = values['turb_100'];
+        $('#cur_tac_temp')[0].innerHTML = values['actual_temperature'] + '&ordm;C';
+        $('#cur_tac_turb')[0].innerHTML = values['actual_turbidity'] + '%';
+        $('#start-tac').show();
+    } else {
+        print_warning('Invalid TAC message received: ' + message);
+    }
+}
+
 function print_warning(message) {
     BootstrapDialog.alert({
         title: 'Error',
@@ -241,6 +358,7 @@ function print_warning(message) {
 }
 
 window.onload = function() {
+    $('.module').hide();
     setHeightSidebar();
     update_position();
     ros_init();
@@ -279,6 +397,22 @@ function add_topic() {
     listener.subscribe(function(message) {
         console.log('New position received: ' + message.data);
         new_position(message.data)
+    });
+
+    tac_topic = new ROSLIB.Topic({
+        ros : ros,
+        name : '/BioBot_To_TAC1',
+        messageType : 'std_msgs/String'
+    });
+
+    listener_tac = new ROSLIB.Topic({
+      ros : ros,
+      name : '/TAC1_To_BioBot',
+      messageType : 'std_msgs/String'
+    });
+
+    listener_tac.subscribe(function(message) {
+        receive_tac(JSON.parse(message.data));
     });
 }
 
