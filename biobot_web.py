@@ -488,7 +488,7 @@ def delete_logs(protocol):
         flash("Cannot delete unexisting protocol {0}".format(protocol), 'danger')
         return redirect(url_for('logs'))
 
-    stats = biobot.stats.delete_one({'id': protocol})
+    biobot.stats.delete_one({'id': protocol})
     client.drop_database(protocol)
     flash("Entry {0} deleted successfully".format(protocol), 'info')
     return redirect(url_for('logs'))

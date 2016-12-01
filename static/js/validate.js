@@ -26,6 +26,11 @@ function move(axis, dist) {
 }
 
 function move_abs(x, y, z) {
+    move_abs_safe(x, y, 0);
+    move_abs_safe(x, y, z);
+}
+
+function move_abs_safe(x, y, z) {
     var abs_dict = {'params': {'args': {'x': x, 'y': y, 'z': z}, 'name': 'pos'}, 'module_type': 'pipette_s'};
     console.log(JSON.stringify(abs_dict));
 
