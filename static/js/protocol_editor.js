@@ -122,11 +122,12 @@ instructions.on("change",  function() {
 
 function start_protocol() {
     var errors_protocol = instructions.validate();
+    var data = get_json_protocol(true);
 
-    if (errors_protocol.length > 0){
+    if (errors_protocol.length > 0 || JSON.parse(data)['instructions'].length == 0){
         BootstrapDialog.alert({
             title: 'Error',
-            message: 'Cannot start a protocol that contain errors',
+            message: 'Cannot start a protocol that contain errors or has no instruction.',
             type: BootstrapDialog.TYPE_DANGER
         });
     } else {
@@ -138,7 +139,7 @@ function start_protocol() {
             callback: function(result){
                 if(result) {
                     var protocol_msg = new ROSLIB.Message({
-                        data: get_json_protocol(true)
+                        data: data
                     });
 
                     console.log(protocol_msg.data)

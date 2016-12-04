@@ -6,6 +6,7 @@
     {{ super() }}
 
     <script src="{{ url_for('static', filename='js/control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
 {% endblock includes %}
 
 {% block content_top %}
@@ -20,6 +21,7 @@
                     <button type="button" id="show-mp-btn" class="btn btn-default navbar-btn" onclick="show('mp')">Multiple Pipette</button>
                     <button type="button" id="show-gripper-btn" class="btn btn-default navbar-btn" onclick="show('gripper')">Gripper</button>
                     <button type="button" id="show-tac-btn" class="btn btn-default navbar-btn" onclick="show('tac')">TAC</button>
+                    <button type="button" id="show-general-btn" class="btn btn-default navbar-btn" onclick="show('general')">General</button>
                 </ul>
             </div>
         </div>
@@ -121,21 +123,44 @@
             <h3>TAC Operation Parameters</h3>
 
             {# User input fields #}
-            <div class="input-group form-group" style="width:260px">
-                <span class="input-group-addon" style="width:151px">Target Temperature</span>
+            <div class="input-group form-group" style="width:390px">
+                <span class="input-group-addon" style="width:155px">Target Temperature</span>
                 <input type="text" id="input-tac-temp" class="form-control" placeholder="2&ordm;C to 55&ordm;C" maxlength="{{conf.limit_input_sm}}">
+                <span class="input-group-btn" style="width:0px;"></span>
+                <input type="text" id="input-tac-temp-goal" class="form-control" placeholder="Post-goal" maxlength="{{conf.limit_input_sm}}">
             </div>
-            <div class="input-group form-group" style="width:260px">
-                <span class="input-group-addon" style="width:151px">Target Turbidity</span>
+            <div class="input-group form-group" style="width:390px">
+                <span class="input-group-addon" style="width:155px">Target Turbidity</span>
                 <input type="text" id="input-tac-turb" class="form-control" placeholder="0% to 100%" maxlength="{{conf.limit_input_sm}}">
+                <span class="input-group-btn" style="width:0px;"></span>
+                <input type="text" id="input-tac-turb-goal" class="form-control" placeholder="Post-goal" maxlength="{{conf.limit_input_sm}}">
             </div>
-            <div class="input-group form-group" style="width:260px">
-                <span class="input-group-addon" style="width:151px">Refresh Rate</span>
-                <input type="text" id="input-tac-rate" class="form-control" placeholder="0.1s to 10s" maxlength="{{conf.limit_input_sm}}">
+            <div class="input-group form-group" style="width:390px">
+                <span class="input-group-addon" style="width:155px">Refresh Rate</span>
+                <input type="text" id="input-tac-rate" class="form-control" placeholder="0.5s to 10s" maxlength="{{conf.limit_input_sm}}">
+                <span class="input-group-btn" style="width:0px;"></span>
+                <input type="text" id="input-tac-rate-goal" class="form-control" placeholder="Post-goal" maxlength="{{conf.limit_input_sm}}">
             </div>
-            <div class="input-group form-group" style="width:260px">
-                <span class="input-group-addon" style="width:151px">Motor Speed</span>
+            <div class="input-group form-group" style="width:390px">
+                <span class="input-group-addon" style="width:155px">Motor Speed</span>
                 <input type="text" id="input-tac-motor" class="form-control" placeholder="0% to 100%" maxlength="{{conf.limit_input_sm}}">
+                <span class="input-group-btn" style="width:0px;"></span>
+                <input type="text" id="input-tac-motor-goal" class="form-control" placeholder="Post-goal" maxlength="{{conf.limit_input_sm}}">
+            </div>
+        </div>
+
+        {# General Control Tab #}
+        <div id="general-control" style="display:none">
+            <h3>General BioBot Utilities</h3>
+            <div>
+                <button type="button" class="btn btn-warning navbar-btn" onclick="general('reset_tips')">
+                    Reset Tips <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary navbar-btn" onclick="general('petri_calibration')">
+                    Calibrate Pixel Size for Petri Dish <span class="glyphicon glyphicon-qrcode" aria-hidden="true"></span>
+                </button>
             </div>
         </div>
     </div>
@@ -186,44 +211,75 @@
         </table>
     </div>
     <div class="module" style="display:none">
-        <h3>Current TAC Status</h3>
-        <table class="table table-striped table-bordered">
-            <tbody>
-                <tr>
-                    <td>Target Temperature</td>
-                    <td id="tac-param-temp">N/A</td>
-                </tr>
-                <tr>
-                    <td>Target Turbidity</td>
-                    <td id="tac-param-turb">N/A</td>
-                </tr>
-                <tr>
-                    <td>Refresh Rate</td>
-                    <td id="tac-param-rate">N/A</td>
-                </tr>
-                <tr>
-                    <td>Motor Speed</td>
-                    <td id="tac-param-motor">N/A</td>
-                </tr>
-                <tr>
-                    <td>Turbidity calibration : 0%</td>
-                    <td id="cur_turb_0">N/A</td>
-                </tr>
-                <tr>
-                    <td>Turbidity calibration : 100%</td>
-                    <td id="cur_turb_100">N/A</td>
-                </tr>
-                <tr>
-                    <td>Temperature</td>
-                    <td id="cur_tac_temp">N/A</td>
-                </tr>
-                <tr>
-                    <td>Turbidity</td>
-                    <td id="cur_tac_turb">N/A</td>
-                </tr>
-            </tbody>
-        </table>
+        <button type="button" class="btn btn-primary tac-graph" onclick="show_tac('status')">Show Status</button>
+        <button type="button" class="btn btn-primary tac-status" onclick="show_tac('graph')">Show Graph</button>
+        <button type="button" class="btn btn-info tac-param" onclick="toggle_params('post-goal')">Show post-goal parameters</button>
+        <button type="button" style="display:none;" class="btn btn-info tac-param-goal" onclick="toggle_params('actual')">Show actual parameters</button>
+        <button type="button" class="btn btn-info tac-graph" onclick="export_tac()">Save TAC values to CSV</button>
+        <div class="tac-status">
+            <h3>Current TAC Status</h3>
+            <table class="table table-striped table-bordered">
+                <tbody>
+                    <tr class="tac-param">
+                        <td>Target Temperature</td>
+                        <td id="tac-param-temp">N/A</td>
+                    </tr>
+                    <tr class="tac-param">
+                        <td>Target Turbidity</td>
+                        <td id="tac-param-turb">N/A</td>
+                    </tr>
+                    <tr class="tac-param">
+                        <td>Refresh Rate</td>
+                        <td id="tac-param-rate">N/A</td>
+                    </tr>
+                    <tr class="tac-param">
+                        <td>Motor Speed</td>
+                        <td id="tac-param-motor">N/A</td>
+                    </tr>
+                    <tr class="tac-param-goal" style="display:none;">
+                        <td>Target Temperature (post-goal)</td>
+                        <td id="tac-param-temp-goal">N/A</td>
+                    </tr>
+                    <tr class="tac-param-goal" style="display:none;">
+                        <td>Target Turbidity (post-goal)</td>
+                        <td id="tac-param-turb-goal">N/A</td>
+                    </tr>
+                    <tr class="tac-param-goal" style="display:none;">
+                        <td>Refresh Rate (post-goal)</td>
+                        <td id="tac-param-rate-goal">N/A</td>
+                    </tr>
+                    <tr class="tac-param-goal" style="display:none;">
+                        <td>Motor Speed (post-goal)</td>
+                        <td id="tac-param-motor-goal">N/A</td>
+                    </tr>
+                    <tr>
+                        <td>Turbidity calibration : 0%</td>
+                        <td id="cur_turb_0">N/A</td>
+                    </tr>
+                    <tr>
+                        <td>Turbidity calibration : 100%</td>
+                        <td id="cur_turb_100">N/A</td>
+                    </tr>
+                    <tr>
+                        <td>Temperature</td>
+                        <td id="cur_tac_temp">N/A</td>
+                    </tr>
+                    <tr>
+                        <td>Turbidity</td>
+                        <td id="cur_tac_turb">N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="tac-graph" style="width:600px;">
+            <h3>TAC Graph</h3>
+            <div id="tac-graph-temp" width="600" height="200"></div>
+            <div id="tac-graph-turb" width="600" height="200"></div>
+        </div>
     </div>
+
+    <!-- Load after TAC Graph is created -->
+    <script src="{{ url_for('static', filename='js/control_tac.js') }}"></script>
 {% endblock content_right %}
 
 {% block content_left_bottom %}
@@ -256,12 +312,12 @@
         {# Send parameters, start calibration and start TAC buttons #}
         <div>
             <button type="button" class="btn btn-primary navbar-btn" onclick="send_tac('config')">
-                <strong>Send Parameters <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></strong>
+                Send Parameters <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
             </button>
         </div>
         <div>
-            <button type="button" class="btn btn-primary navbar-btn" onclick="send_tac('calibration_0')">
-                <strong>Start Calibration <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></strong>
+            <button type="button" class="btn btn-primary navbar-btn" onclick="send_tac('calibrate_0')">
+                Start Calibration <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
             </button>
         </div>
         <div id="start-tac" style="display:none;">

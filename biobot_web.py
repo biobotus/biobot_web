@@ -420,7 +420,7 @@ def log_bca(protocol, step=None):
 
     df = pd.DataFrame(colonies)
     steps = sorted(df.step.unique())
-    if not step:
+    if step is None:
         return redirect("{0}/step/{1}".format(request.url, steps[0]))
 
     current_colonies = list(db.colonies.find({'step': step, 'operation': 'analysis'}))
@@ -457,7 +457,7 @@ def log_picking(protocol, pick_num, step=None):
         return redirect("/logs/{0}".format(protocol))
 
     steps = sorted(pd.DataFrame(colonies).step.unique())
-    if not step:
+    if step is None:
         return redirect("{0}/step/{1}".format(request.url, steps[0]))
 
     current_colonies = list(db.colonies.find({'step': step, 'operation': pick_num}))

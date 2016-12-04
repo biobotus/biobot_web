@@ -309,6 +309,57 @@ def get_schema(value, conf, biobot):
                 }
             },
             {
+                'title': 'Excentricity',
+                'description': 'An excentricity of 0 is a perfect circle.',
+                'properties': {
+                    'category': {
+                        'title': 'Type of criteria',
+                        'type': 'string',
+                        'enum': ['excentricity'],
+                        'propertyOrder': 1
+                    },
+                    'minimum': {
+                        'title': 'Minimum excentricity',
+                        'type': 'number',
+                        'minimum': 0,
+                        'maximum': 1,
+                        'default': 0,
+                        'propertyOrder': 2
+                    },
+                    'maximum': {
+                        'title': 'Maximum excentricity',
+                        'type': 'number',
+                        'minimum': 0,
+                        'maximum': 1,
+                        'default': 1,
+                        'propertyOrder': 3
+                    }
+                }
+            },
+            {
+                'title': 'Perimeter',
+                'properties': {
+                    'category': {
+                        'title': 'Type of criteria',
+                        'type': 'string',
+                        'enum': ['perimeter'],
+                        'propertyOrder': 1
+                    },
+                    'minimum': {
+                        'title': 'Minimum perimeter (mm)',
+                        'type': 'number',
+                        'minimum': 0,
+                        'propertyOrder': 2
+                    },
+                    'maximum': {
+                        'title': 'Maximum perimeter (mm)',
+                        'type': 'number',
+                        'minimum': 0,
+                        'propertyOrder': 3
+                    }
+                }
+            },
+            {
                 'title': 'Segmentation',
                 'description': 'Default is false, even if criteria is not selected.',
                 'properties': {
@@ -416,13 +467,19 @@ def get_schema(value, conf, biobot):
                 'op': {
                     'title': 'Petri Dish Analysis',
                     'type': 'string',
-                    'enum': ['petri_analysis'],
+                    'enum': ['2d_camera'],
                     'propertyOrder': 1
                 },
                 'name': {
                     'title': 'Petri Dish Name',
                     'type': 'string',
                     'propertyOrder': 2
+                },
+                'light': {
+                    'title': 'Backlight color',
+                    'type': 'string',
+                    'enum': ['white', 'blue'],
+                    'propertyOrder': 3
                 },
                 'groups': petri_analysis_groups
             }

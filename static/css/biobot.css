@@ -87,3 +87,25 @@ button.eStop:hover {
     cursor: pointer;
     display: block;
 }
+
+.axis path{
+    display: none;
+}
+
+.axis text{
+    font-family: sans-serif;
+    font-size: 10.5px;
+}
+
+.axis line {
+    fill: none;
+    stroke: lightgray;
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+}
+
+.line {
+    fill: none;
+    stroke-width: 2px;
+}
+

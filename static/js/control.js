@@ -1,27 +1,27 @@
-var listener;
-var new_step;
-var new_step_rel;
-var sections = ['axis', 'sp', 'mp', 'gripper', 'tac'];
-var visible_section = 'axis';
-var axis_mode = 'Relative Movement';
-var z_mode = 'Single Pipette';
-var z_ids = {'Single Pipette': 0, 'Multiple Pipette': 1, 'Gripper': 2};
-var tac_calib_cb = false;
+var listener,
+    new_step,
+    new_step_rel,
+    sections = ['axis', 'sp', 'mp', 'gripper', 'tac', 'general'],
+    visible_section = 'axis',
+    axis_mode = 'Relative Movement',
+    z_mode = 'Single Pipette',
+    z_ids = {'Single Pipette': 0, 'Multiple Pipette': 1, 'Gripper': 2},
+    tac_calib_cb = false;
 
 // Variables used to display current position
 var cur_pos_ids = ['cur_x_mm', 'cur_y_mm', 'cur_z0_mm',
                    'cur_z1_mm', 'cur_z2_mm', 'cur_sp_ul',
-                   'cur_mp_ul', 'cur_g_wr', 'cur_g_op'];
-var not_available = 'N/A';
-var cur_x_mm_str  = not_available;
-var cur_y_mm_str  = not_available;
-var cur_z0_mm_str = not_available;
-var cur_z1_mm_str = not_available;
-var cur_z2_mm_str = not_available;
-var cur_sp_ul_str = not_available;
-var cur_mp_ul_str = not_available;
-var cur_g_wr_str = not_available;
-var cur_g_op_str = not_available;
+                   'cur_mp_ul', 'cur_g_wr', 'cur_g_op'],
+    not_available = 'N/A',
+    cur_x_mm_str  = not_available,
+    cur_y_mm_str  = not_available,
+    cur_z0_mm_str = not_available,
+    cur_z1_mm_str = not_available,
+    cur_z2_mm_str = not_available,
+    cur_sp_ul_str = not_available,
+    cur_mp_ul_str = not_available,
+    cur_g_wr_str = not_available,
+    cur_g_op_str = not_available;
 
 function show(section) {
     visible_section = section;
@@ -41,9 +41,26 @@ function show(section) {
     if (section == 'tac') {
         $('.platform').hide();
         $('.module').show();
+    } else if (section == 'general') {
+        $('.platform').hide();
+        $('.module').hide();
     } else {
         $('.platform').show();
         $('.module').hide();
+    }
+}
+
+function show_tac(section) {
+    if (section == 'status') {
+        $('.tac-status').show();
+        $('.tac-graph').hide();
+        $('.tac-param').show();
+        $('.tac-param-goal').hide();
+    } else {
+        $('.tac-status').hide();
+        $('.tac-graph').show();
+        $('.tac-param').hide();
+        $('.tac-param-goal').hide();
     }
 }
 
@@ -246,17 +263,17 @@ function send_tac(action) {
 
     if (action == 'config') {
         // Send Parameters to TAC
-        var input_temp  = $('#input-tac-temp')[0];
-        var input_turb  = $('#input-tac-turb')[0];
-        var input_rate  = $('#input-tac-rate')[0];
-        var input_motor = $('#input-tac-motor')[0];
+        var temp_val = $('#input-tac-temp')[0].value;
+        var turb_val = $('#input-tac-turb')[0].value;
+        var rate_val = $('#input-tac-rate')[0].value;
+        var motor_val = $('#input-tac-motor')[0].value;
+        var temp_goal_val = $('#input-tac-temp-goal')[0].value;
+        var turb_goal_val = $('#input-tac-turb-goal')[0].value;
+        var rate_goal_val = $('#input-tac-rate-goal')[0].value;
+        var motor_goal_val = $('#input-tac-motor-goal')[0].value;
 
-        var temp_val = input_temp.value;
-        var turb_val = input_turb.value;
-        var rate_val = input_rate.value;
-        var motor_val = input_motor.value;
-
-        if (!$.isNumeric(temp_val) || !$.isNumeric(turb_val) || !$.isNumeric(rate_val) || !$.isNumeric(motor_val)) {
+        if (!$.isNumeric(temp_val) || !$.isNumeric(turb_val) || !$.isNumeric(rate_val) || !$.isNumeric(motor_val)
+            || !$.isNumeric(temp_goal_val) || !$.isNumeric(turb_goal_val) || !$.isNumeric(rate_goal_val) || !$.isNumeric(motor_goal_val)) {
             print_warning('TAC Parameter require numeric inputs.');
             return
         }
@@ -265,19 +282,29 @@ function send_tac(action) {
         turb_val = parseFloat(turb_val)
         rate_val = parseFloat(rate_val)
         motor_val = parseFloat(motor_val)
+        temp_goal_val = parseFloat(temp_goal_val)
+        turb_goal_val = parseFloat(turb_goal_val)
+        rate_goal_val = parseFloat(rate_goal_val)
+        motor_goal_val = parseFloat(motor_goal_val)
 
-        if (temp_val < 2 || temp_val > 55 || turb_val < 0 || turb_val > 100 || rate_val < 0.1 || rate_val > 10 || motor_val < 0 || motor_val > 100) {
+        if (temp_val < 2 || temp_val > 55 || turb_val < 0 || turb_val > 100
+            || rate_val < 0.5 || rate_val > 10 || motor_val < 0 || motor_val > 100
+            || temp_goal_val < 2 || temp_goal_val > 55 || turb_goal_val < 0 || turb_goal_val > 100
+            || rate_goal_val < 0.5 || rate_goal_val > 10 || motor_goal_val < 0 || motor_goal_val > 100) {
             print_warning('At least one TAC parameter is out of limits.');
             return
         }
 
-        params = {'target_temperature': temp_val, 'target_turbidity': turb_val, 'refresh_rate': rate_val, 'motor_speed': motor_val};
+        params = {'target_temperature': temp_val, 'target_turbidity': turb_val,
+                  'refresh_rate': rate_val*1000, 'motor_speed': motor_val,
+                  'target_temperature_goal': temp_goal_val, 'target_turbidity_goal': turb_goal_val,
+                  'refresh_rate_goal': rate_goal_val*1000, 'motor_speed_goal': motor_goal_val};
 
-    } else if (action.startsWith('calibration')) {
+    } else if (action.startsWith('calibrate')) {
         params = parseInt(action.split('_')[1])
         if (tac_calib_cb) {
             tac_calib_cb = false;
-            action = 'calibration';
+            action = 'calibrate';
         } else {
             var msg;
             if (params == 100)
@@ -324,28 +351,89 @@ function send_tac(action) {
 
 function receive_tac(message) {
     if (message['action'] == 'calibration_result') {
-        if ('turb_0' in message['params']) {
-            $('#cur_turb_0')[0].innerHTML = message['params']['turb_0'];
-            send_tac('calibration_100');
-        } else if ('turb_100' in message['params']) {
-            $('#cur_turb_100')[0].innerHTML = message['params']['turb_100'];
+        if ('turb_0' in message) {
+            $('#cur_turb_0')[0].innerHTML = message['turb_0'];
+            send_tac('calibrate_100');
+        } else if ('turb_100' in message) {
+            $('#cur_turb_100')[0].innerHTML = message['turb_100'];
             $('#start-tac').show();
         } else {
             print_warning('Invalid calibration result received: ' + message['params']);
         }
     } else if (message['action'] == 'actual_values') {
-        var values = message['params'];
-        $('#tac-param-temp')[0].innerHTML = values['target_temperature'] + '&ordm;C';
-        $('#tac-param-turb')[0].innerHTML = values['target_turbidity'] + '%';
-        $('#tac-param-rate')[0].innerHTML = values['refresh_rate'] + 's';
-        $('#tac-param-motor')[0].innerHTML = values['motor_speed'] + '%';
-        $('#cur_turb_0')[0].innerHTML = values['turb_0'];
-        $('#cur_turb_100')[0].innerHTML = values['turb_100'];
-        $('#cur_tac_temp')[0].innerHTML = values['actual_temperature'] + '&ordm;C';
-        $('#cur_tac_turb')[0].innerHTML = values['actual_turbidity'] + '%';
+        $('#tac-param-temp')[0].innerHTML = message['target_temperature'] + '&ordm;C';
+        $('#tac-param-turb')[0].innerHTML = message['target_turbidity'] + '%';
+        $('#tac-param-rate')[0].innerHTML = message['refresh_rate']/1000 + 's';
+        $('#tac-param-motor')[0].innerHTML = message['motor_speed'] + '%';
+        $('#tac-param-temp-goal')[0].innerHTML = message['target_temperature_goal'] + '&ordm;C';
+        $('#tac-param-turb-goal')[0].innerHTML = message['target_turbidity_goal'] + '%';
+        $('#tac-param-rate-goal')[0].innerHTML = message['refresh_rate_goal']/1000 + 's';
+        $('#tac-param-motor-goal')[0].innerHTML = message['motor_speed_goal'] + '%';
+        $('#cur_turb_0')[0].innerHTML = message['turb_0'];
+        $('#cur_turb_100')[0].innerHTML = message['turb_100'];
+        $('#cur_tac_temp')[0].innerHTML = message['actual_temperature'].toFixed(1) + '&ordm;C';
+        $('#cur_tac_turb')[0].innerHTML = message['actual_turbidity'].toFixed(1) + '%';
         $('#start-tac').show();
+        new_tac_value(message['time'], message['actual_temperature'].toFixed(1), message['actual_turbidity'].toFixed(1))
     } else {
         print_warning('Invalid TAC message received: ' + message);
+    }
+}
+
+function export_tac() {
+    var csvContent = "data:text/csv;charset=utf-8,time,temperature,turbidity\n";
+    data.forEach(function(d){
+        csvContent += d.date.toISOString()+','+d.temp+','+d.turb+'\n';
+    });
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "tac_graph_values.csv");
+    link.click();
+}
+
+function toggle_params(time) {
+    if (time == 'actual') {
+        $('.tac-param').show();
+        $('.tac-param-goal').hide();
+    } else {
+        $('.tac-param').hide();
+        $('.tac-param-goal').show();
+    }
+
+}
+
+function general(action) {
+    if (action == 'reset_tips') {
+        BootstrapDialog.confirm({
+            title: 'Reset Tips',
+            message: 'Really tell BioBot all tip holders on the deck are full?',
+            type: BootstrapDialog.TYPE_WARNING,
+            btnOKLabel: 'Confirm',
+            callback: function(result){
+                if(result) {
+                    var msg = new ROSLIB.Message({
+                        data : true
+                    });
+                    reset_tips.publish(msg);
+                }
+            }
+        });
+    } else if (action == 'petri_calibration') {
+        BootstrapDialog.confirm({
+            title: 'Calibrate Pixel Size of Petri Dish',
+            message: 'Place the QR code Petri Dish in the Petri Module and click \'Confirm\'',
+            type: BootstrapDialog.TYPE_PRIMARY,
+            btnOKLabel: 'Confirm',
+            callback: function(result){
+                if(result) {
+                    var msg = new ROSLIB.Message({
+                        data : true
+                    });
+                    pixel_size.publish(msg);
+                }
+            }
+        });
     }
 }
 
@@ -359,6 +447,7 @@ function print_warning(message) {
 
 window.onload = function() {
     $('.module').hide();
+    $('.tac-graph').hide();
     setHeightSidebar();
     update_position();
     ros_init();
@@ -401,19 +490,32 @@ function add_topic() {
 
     tac_topic = new ROSLIB.Topic({
         ros : ros,
-        name : '/BioBot_To_TAC1',
+        name : '/Biobot_To_Tac1',
         messageType : 'std_msgs/String'
     });
 
     listener_tac = new ROSLIB.Topic({
       ros : ros,
-      name : '/TAC1_To_BioBot',
+      name : '/Tac1_To_Biobot',
       messageType : 'std_msgs/String'
     });
 
     listener_tac.subscribe(function(message) {
         receive_tac(JSON.parse(message.data));
     });
+
+    reset_tips = new ROSLIB.Topic({
+        ros : ros,
+        name : '/Reset_Tips',
+        messageType : 'std_msgs/Bool'
+    });
+
+    pixel_size = new ROSLIB.Topic({
+        ros : ros,
+        name : '/Pixel_Size',
+        messageType : 'std_msgs/Bool'
+    });
+
 }
 
 function home(axis) {

@@ -9,7 +9,7 @@ function update_status(msg) {
     if (msg.startsWith('powered off')) {
         $('#pause').hide()
         $('#resume').hide()
-    } else if (msg.startsWith('paused')) {
+    } else if (msg.endsWith('(paused)')) {
         $('#pause').hide()
         $('#resume').show()
     } else {
