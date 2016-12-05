@@ -24,11 +24,11 @@
                 <tr>
                     <td>{{colony['id']}}</td>
                     <td><span class="glyphicon glyphicon-stop" aria-hidden=true style="color:{{colony['color']}}"></span> {{colony['color_text']}}</td>
-                    <td>{{"{0:.2f} px<sup>2</sup>".format(colony['area'])|safe}}</td>
-                    <td>{{"{0:.2f} px".format(colony['perimeter'])}}</td>
+                    <td>{{"{0:.2f} mm<sup>2</sup>".format(colony['area'])|safe}}</td>
+                    <td>{{"{0:.2f} mm".format(colony['perimeter'])}}</td>
                     <td>{{"{0:.2f}".format(colony['excentricity'])}}</td>
-                    <td>{{"{0:.2f} px".format(colony['y'])}}</td>
-                    <td>{{"{0:.2f} px".format(colony['x'])}}</td>
+                    <td>{{"{0:.2f} mm".format(colony['y'])}}</td>
+                    <td>{{"{0:.2f} mm".format(colony['x'])}}</td>
                 </tr>
             {% endfor %}
         </tbody>

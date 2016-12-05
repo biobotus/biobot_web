@@ -31,7 +31,7 @@
                 <tr>
                     <td><a href="/logs/{{stat['id']}}">{{stat['id']}}</a></td>
                     <td>{{stat['name']}}</td>
-                    <td>{{stat['description']}}</td>
+                    <td>{{stat['description']|nl2br}}</td>
                     <td>{{stat['nb_steps']}}</td>
                     <td>{{convert_ts(stat['start'])}}</td>
                     <td>{{convert_ts(stat['end']) if 'end' in stat else 'Not finished'}}</td>

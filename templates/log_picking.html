@@ -10,10 +10,15 @@
 
     <div style="margin-top:15px;margin-right:15px">
         <table class="table table-bordered">
-            <tr><th>Desired colony characteristics</th></tr>
+            <tr><th colspan=2>Desired colony characteristics of {{characteristics['pick_num']}}</th></tr>
             <tbody>
-                <tr><td>Color : blue</td></tr>
-                <tr><td>Area : > 1 mm²</td></tr>
+                <tr>
+                    <td>Number of colonies</td>
+                    <td>{{characteristics['nb_col']}}</td>
+                </tr>
+                {% for criteria in characteristics['criterias'] %}
+                    <tr><td>{{criteria[0]}}</td><td>{{criteria[1]|safe}}</td></tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -39,11 +44,11 @@
                 <tr>
                     <td>{{colony['id']}}</td>
                     <td><span class="glyphicon glyphicon-stop" aria-hidden=true style="color:{{colony['color']}}"></span> {{colony['color_text']}}</td>
-                    <td>{{"{0:.2f} px<sup>2</sup>".format(colony['area'])|safe}}</td>
-                    <td>{{"{0:.2f} px".format(colony['perimeter'])}}</td>
+                    <td>{{"{0:.2f} mm<sup>2</sup>".format(colony['area'])|safe}}</td>
+                    <td>{{"{0:.2f} mm".format(colony['perimeter'])}}</td>
                     <td>{{"{0:.2f}".format(colony['excentricity'])}}</td>
-                    <td>{{"{0:.2f} px".format(colony['y'])}}</td>
-                    <td>{{"{0:.2f} px".format(colony['x'])}}</td>
+                    <td>{{"{0:.2f} mm".format(colony['y'])}}</td>
+                    <td>{{"{0:.2f} mm".format(-colony['x'])}}</td>
                     {% if colony['selected'] == 1 %}
                         <td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span><span style="display:none">Yes</span></td>
                     {% else %}

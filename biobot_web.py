@@ -465,6 +465,8 @@ def log_picking(protocol, pick_num, step=None):
     colors = list(df.color_text.unique())
     current_colonies = [x.to_dict() for _, x in df.iterrows()]
 
+    characteristics = db.picking.find_one({'step': step, 'pick_num': pick_num})
+
     pictures = [{
                     'title': 'Raw',
                     'description': 'Raw picture of the Petri dish',
@@ -477,7 +479,8 @@ def log_picking(protocol, pick_num, step=None):
 
     return render_template('log_picking.html', active='BCA', protocol=protocol, \
                            steps=steps, current=step, colonies=current_colonies, \
-                           pick_num=pick_num, colors=colors, db=db, pictures=pictures)
+                           colors=colors, db=db, pictures=pictures,
+                           characteristics=characteristics)
 
 @app.route('/logs/delete/<protocol>')
 @login_required
