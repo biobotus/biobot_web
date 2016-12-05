@@ -272,9 +272,18 @@ function send_tac(action) {
         var rate_goal_val = $('#input-tac-rate-goal')[0].value;
         var motor_goal_val = $('#input-tac-motor-goal')[0].value;
 
+        if (turb_goal_val == 'Off')
+            turb_goal_val = false;
+        else
+            turb_goal_val = true;
+
+        var temp_tmp = temp_goal_val;
+        if (temp_goal_val == 'Disabled')
+            temp_tmp = -1;
+
         if (!$.isNumeric(temp_val) || !$.isNumeric(turb_val) || !$.isNumeric(rate_val) || !$.isNumeric(motor_val)
-            || !$.isNumeric(temp_goal_val) || !$.isNumeric(turb_goal_val) || !$.isNumeric(rate_goal_val) || !$.isNumeric(motor_goal_val)) {
-            print_warning('TAC Parameter require numeric inputs.');
+            || !$.isNumeric(temp_tmp) || !$.isNumeric(rate_goal_val) || !$.isNumeric(motor_goal_val)) {
+            print_warning('TAC Parameters require numeric inputs.');
             return
         }
 
@@ -282,22 +291,21 @@ function send_tac(action) {
         turb_val = parseFloat(turb_val)
         rate_val = parseFloat(rate_val)
         motor_val = parseFloat(motor_val)
-        temp_goal_val = parseFloat(temp_goal_val)
-        turb_goal_val = parseFloat(turb_goal_val)
+        temp_tmp = parseFloat(temp_tmp)
         rate_goal_val = parseFloat(rate_goal_val)
         motor_goal_val = parseFloat(motor_goal_val)
 
         if (temp_val < 2 || temp_val > 55 || turb_val < 0 || turb_val > 100
-            || rate_val < 0.5 || rate_val > 10 || motor_val < 0 || motor_val > 100
-            || temp_goal_val < 2 || temp_goal_val > 55 || turb_goal_val < 0 || turb_goal_val > 100
-            || rate_goal_val < 0.5 || rate_goal_val > 10 || motor_goal_val < 0 || motor_goal_val > 100) {
+            || rate_val < 0.5 || rate_val > 100 || motor_val < 0 || motor_val > 100
+            || ((temp_tmp < 2 || temp_tmp > 55) && temp_tmp != -1) || +temp_goal_val == -1
+            || rate_goal_val < 0.5 || rate_goal_val > 100 || motor_goal_val < 0 || motor_goal_val > 100) {
             print_warning('At least one TAC parameter is out of limits.');
             return
         }
 
         params = {'target_temperature': temp_val, 'target_turbidity': turb_val,
                   'refresh_rate': rate_val*1000, 'motor_speed': motor_val,
-                  'target_temperature_goal': temp_goal_val, 'target_turbidity_goal': turb_goal_val,
+                  'target_temperature_goal': temp_tmp, 'target_turbidity_goal': turb_goal_val,
                   'refresh_rate_goal': rate_goal_val*1000, 'motor_speed_goal': motor_goal_val};
 
     } else if (action.startsWith('calibrate')) {
@@ -365,8 +373,8 @@ function receive_tac(message) {
         $('#tac-param-turb')[0].innerHTML = message['target_turbidity'] + '%';
         $('#tac-param-rate')[0].innerHTML = message['refresh_rate']/1000 + 's';
         $('#tac-param-motor')[0].innerHTML = message['motor_speed'] + '%';
-        $('#tac-param-temp-goal')[0].innerHTML = message['target_temperature_goal'] + '&ordm;C';
-        $('#tac-param-turb-goal')[0].innerHTML = message['target_turbidity_goal'] + '%';
+        $('#tac-param-temp-goal')[0].innerHTML = message['target_temperature_goal'] == -1 ? 'Disabled' : message['target_temperature_goal'] + '&ordm;C';
+        $('#tac-param-turb-goal')[0].innerHTML = message['target_turbidity_goal'] ? 'On' : 'Off';
         $('#tac-param-rate-goal')[0].innerHTML = message['refresh_rate_goal']/1000 + 's';
         $('#tac-param-motor-goal')[0].innerHTML = message['motor_speed_goal'] + '%';
         $('#cur_turb_0')[0].innerHTML = message['turb_0'];
@@ -452,6 +460,23 @@ window.onload = function() {
     update_position();
     ros_init();
     add_topic();
+
+    $('#input-tac-turb-goal').dblclick(function() {
+        if (this.value == 'Off')
+            this.value = 'On'
+        else
+            this.value = 'Off'
+    });
+    $('#input-tac-temp-goal').dblclick(function() {
+        if (this.readOnly) {
+            this.value = this.getAttribute('data-val')
+            this.readOnly = false;
+        } else {
+            this.readOnly = true;
+            this.setAttribute('data-val', this.value)
+            this.value = 'Disabled'
+        }
+    });
 }
 
 window.onbeforeunload = function(){
