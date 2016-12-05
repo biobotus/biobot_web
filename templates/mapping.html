@@ -66,7 +66,7 @@
             <tbody>
                 {% for item in from_carto %}
                     <tr>
-                        <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}
+                        <td>{{get_item_picture("{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
                         <td>{{item['type'].replace('_', ' ').title()}}</td>
                         <td>{{item['carto_x']}}</td>
                         <td>{{item['carto_y']}}</td>
@@ -97,7 +97,7 @@
                 {% for item in validated %}
                     <tr>
                         {% if item['source'] == '3d_cartography' %}
-                            <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
+                            <td>{{get_item_picture("{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
                         {% else %}
                             <td></td>
                         {% endif %}

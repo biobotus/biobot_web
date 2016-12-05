@@ -373,8 +373,8 @@ function receive_tac(message) {
         $('#tac-param-turb')[0].innerHTML = message['target_turbidity'] + '%';
         $('#tac-param-rate')[0].innerHTML = message['refresh_rate']/1000 + 's';
         $('#tac-param-motor')[0].innerHTML = message['motor_speed'] + '%';
-        $('#tac-param-temp-goal')[0].innerHTML = message['target_temperature_goal'] == -1 ? 'Disabled' : message['target_temperature_goal'] + '&ordm;C';
         $('#tac-param-turb-goal')[0].innerHTML = message['target_turbidity_goal'] ? 'On' : 'Off';
+        $('#tac-param-temp-goal')[0].innerHTML = message['target_temperature_goal'] == -1 ? 'Disabled' : message['target_temperature_goal'] + '&ordm;C';
         $('#tac-param-rate-goal')[0].innerHTML = message['refresh_rate_goal']/1000 + 's';
         $('#tac-param-motor-goal')[0].innerHTML = message['motor_speed_goal'] + '%';
         $('#cur_turb_0')[0].innerHTML = message['turb_0'];
@@ -408,7 +408,6 @@ function toggle_params(time) {
         $('.tac-param').hide();
         $('.tac-param-goal').show();
     }
-
 }
 
 function general(action) {

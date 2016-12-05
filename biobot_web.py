@@ -98,6 +98,7 @@ conf.__dict__.update(args.__dict__)
 # Get MongoDB Database Client
 client = pymongo.MongoClient()
 biobot = client['biobot']
+fs = GridFS(biobot)
 
 # Validate MongoDB is started, else exit
 try:
@@ -249,7 +250,6 @@ def ros_thread():
 @login_required
 @admin_required
 def ros_status():
-    print(ros_pid)
     return render_template('ros_status.html', pid=ros_pid)
 
 @app.route('/ros_start')
@@ -327,7 +327,6 @@ def mapping_delete(uid):
     item = biobot.deck.find_one({'uuid': uid})
     if item:
         if item['source'] == '3d_cartography':
-            fs = GridFS(biobot)
             fs.delete(item['image_id'])
         biobot.deck.delete_one(item)
     return redirect(url_for('mapping'))
@@ -489,6 +488,10 @@ def delete_logs(protocol):
         return redirect(url_for('logs'))
 
     biobot.stats.delete_one({'id': protocol})
+    images = list(biobot.bca_images.find({'protocol': 'protocol'}))
+    for img in images:
+        fs.delete(img['image_id'])
+    biobot.bca_images.delete_many({'protocol': protocol})
     client.drop_database(protocol)
     flash("Entry {0} deleted successfully".format(protocol), 'info')
     return redirect(url_for('logs'))
@@ -656,24 +659,32 @@ def format_sidebar(name, icon, url):
 
     current_url = request.path.split('/')[1]
     active = ' class="active"' if url == current_url else ''
-    html = '<li{0}><a href="/{1}"><i style="float:left; margin-right: 14px;">'\
+    html = '<li{0}><a href="/{1}"><i style="float:left; margin-right: 14px;">' \
            '<span class="glyphicon glyphicon-{2}"></span></i>{3}' \
            '</a></li>'.format(active, url, icon, name)
 
     return Markup(html)
 
-def get_picture(database, collection, filename, tags="", download=False):
-    db = client[database]
-    coll = db[collection]
-    image = coll.find_one({'filename': filename})
+def get_item_picture(filename, tags=""):
+    image = biobot.deck.find_one({'filename': filename})
     if image:
         image_id = image['image_id']
-        fs = GridFS(db)
         img = fs.get(image_id).read()
         b64data = base64.b64encode(img).decode('utf-8')
         html = '<img src="data:image/jpeg;base64,{0}" {1}>'.format(b64data, tags)
-        if download:
-            html = '<a href="data:image/jpeg;base64,{0}" download="{1}">{2}</a>'.format(b64data, filename, html)
+    else:
+        html = '<img alt="Image {0} not found" {1}>'.format(filename, tags)
+
+    return Markup(html)
+
+def get_bca_picture(filename, protocol, step, tags=""):
+    image = biobot.bca_images.find_one({'protocol': protocol, 'step': step, 'filename': filename})
+    if image:
+        image_id = image['image_id']
+        img = fs.get(image_id).read()
+        b64data = base64.b64encode(img).decode('utf-8')
+        img_html = '<img src="data:image/jpeg;base64,{0}" {1}>'.format(b64data, tags)
+        html = '<a href="data:image/jpeg;base64,{0}" download="{1}">{2}</a>'.format(b64data, filename, img_html)
     else:
         html = '<img alt="Image {0} not found" {1}>'.format(filename, tags)
 
@@ -689,7 +700,8 @@ app.jinja_env.globals.update(conf=conf,
                                           'autocomplete=off'),
                              format_sidebar=format_sidebar,
                              convert_ts=convert_ts,
-                             get_picture=get_picture)
+                             get_item_picture=get_item_picture,
+                             get_bca_picture=get_bca_picture)
 
 # Start the application
 if __name__ == '__main__':

@@ -38,7 +38,7 @@
                             <div class="carousel-inner" role="listbox">
                                 {% for pic in pictures %}
                                     <div class="item {{'active' if pic == pictures[0]}}">
-                                        {{get_picture(protocol, 'images', pic['filename'], download=True,
+                                        {{get_bca_picture(pic['filename'], protocol, current,
                                           tags='style="height:{0}px;width:{1}px"'.format(conf.cam_2d_height/conf.bca_factor,
                                                                                          conf.cam_2d_width/conf.bca_factor))}}
                                         <div class="carousel-caption">

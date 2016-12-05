@@ -42,7 +42,7 @@
         <tbody>
             <tr><form method="post">
                 {% if item['source'] == '3d_cartography' %}
-                    <td>{{get_picture('biobot', 'deck', "{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
+                    <td>{{get_item_picture("{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
                 {% endif %}
                 <td>
                     <input type=text name="name" class="form-control" value="{{item.get('name', '')}}" maxlength="{{conf.limit_input_md}}">
