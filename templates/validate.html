@@ -51,15 +51,15 @@
                     <select class="selectpicker show-tick" data-width="fit" data-size="5" name="type" data-default="{{item['type']}}"></select>
                 </td>
                 <td class="w150px"><div class="input-group">
-                    <input type="text" id="valid_x" name="valid_x" class="form-control" value="{{item.get('valid_x', '')}}" readonly>
+                    <input type="text" id="valid_x" name="valid_x" class="form-control" value="{{item.get('valid_x', '')}}" {% if not current_user.is_admin() %}readonly{% endif %}>
                     <span class="input-group-addon">mm</span>
                 </div></td>
                 <td class="w150px"><div class="input-group">
-                    <input type="text" id="valid_y" name="valid_y" class="form-control" value="{{item.get('valid_y', '')}}" readonly>
+                    <input type="text" id="valid_y" name="valid_y" class="form-control" value="{{item.get('valid_y', '')}}" {% if not current_user.is_admin() %}readonly{% endif %}>
                     <span class="input-group-addon">mm</span>
                 </div></td>
                 <td class="w150px"><div class="input-group">
-                    <input type="text" id="valid_z" name="valid_z" class="form-control" value="{{item.get('valid_z', '')}}" readonly>
+                    <input type="text" id="valid_z" name="valid_z" class="form-control" value="{{item.get('valid_z', '')}}" {% if not current_user.is_admin() %}readonly{% endif %}>
                     <span class="input-group-addon">mm</span>
                 </div></td>
                 <td class="w150px"><input type=submit value="Confirm and save" class="btn btn-success"></td>
@@ -71,7 +71,7 @@
     {% for i in [('X', 'primary'), ('Y', 'default'), ('Z', 'primary')] %}
         <div>
             <h4 class="ib" style="margin-right:5px"><strong>Move {{i[0]}} (mm)</strong></h4>
-            {% for dist in [-100, -50, -20, -10, -5, -2, -1, 1, 2, 5, 10, 20, 50, 100] %}
+            {% for dist in [-100, -50, -10, -5, -1, -0.5, -0.1, 0.1, 0.5, 1, 5, 10, 50, 100] %}
                 <button class="btn btn-{{i[1]}} navbar-btn" onclick="move('{{i[0]}}', {{dist}})" style="width:55px">{{dist}}</button>
             {% endfor %}
         </div>

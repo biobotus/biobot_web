@@ -1,5 +1,12 @@
 {% extends "layout_logs.html" %}
 
+{% block includes %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.columnFilter.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jszip.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/buttons.html5.min.js') }}"></script>
+{% endblock includes %}
+
 {% block content_main %}
     <div class="table-responsive" style="overflow:visible">
         <table>

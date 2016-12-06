@@ -1,10 +1,5 @@
 {% extends "layout_analysis.html" %}
 
-{% block includes %}
-    {{ super() }}
-    <script src="{{ url_for('static', filename='js/jquery.dataTables.columnFilter.js') }}"></script>
-{% endblock includes %}
-
 {% block content_bottom %}
     <h3>Bacterial colonies characteristics</h3>
     <table id="table" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
@@ -12,23 +7,23 @@
             <tr>
                 <th>ID</th>
                 <th>Color</th>
-                <th>Area</th>
-                <th>Perimeter</th>
+                <th>Area (mm<sup>2</sup>)</th>
+                <th>Perimeter (mm)</th>
                 <th>Excentricity</th>
-                <th>X coordinate</th>
-                <th>Y coordinate</th>
+                <th>X coordinate (mm)</th>
+                <th>Y coordinate (mm)</th>
             </tr>
         </thead>
         <tbody>
             {% for colony in colonies %}
                 <tr>
                     <td>{{colony['id']}}</td>
-                    <td><span class="glyphicon glyphicon-stop" aria-hidden=true style="color:{{colony['color']}}"></span> {{colony['color_text']}}</td>
-                    <td>{{"{0:.2f} mm<sup>2</sup>".format(colony['area'])|safe}}</td>
-                    <td>{{"{0:.2f} mm".format(colony['perimeter'])}}</td>
-                    <td>{{"{0:.2f}".format(colony['excentricity'])}}</td>
-                    <td>{{"{0:.2f} mm".format(colony['y'])}}</td>
-                    <td>{{"{0:.2f} mm".format(colony['x'])}}</td>
+                    <td><span class="glyphicon glyphicon-stop" aria-hidden=true title="{{colony['color']}}" style="color:{{colony['color']}}"></span> {{colony['color_text']}}</td>
+                    <td>{{"{0:.2f}".format(colony['area'])|float}}</td>
+                    <td>{{"{0:.2f}".format(colony['perimeter'])|float}}</td>
+                    <td>{{"{0:.2f}".format(colony['excentricity'])|float}}</td>
+                    <td>{{"{0:.2f}".format(colony['y'])|float}}</td>
+                    <td>{{"{0:.2f}".format(-colony['x'])|float}}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -37,7 +32,15 @@
     <script>
         $(document).ready(function() {
             var table = $('#table').dataTable({
-                "lengthMenu": [[5, 25, 100, -1], [5, 25, 100, "All"]]
+                dom: '<"row"<"col-sm-4"l><"col-sm-4"B><"col-sm-4"f>><"row"<"col-sm-12"tr>><"row"<"col-sm-5"i><"col-sm-7"p>>',
+                "lengthMenu": [[5, 25, 100, -1], [5, 25, 100, "All"]],
+                buttons: [{
+                    extend: 'excel',
+                    text: 'Export to Excel',
+                    filename: '{{"{}_{}".format(protocol, pick_num)}}',
+                    className: 'btn btn-success btn-sm',
+                    header: true
+                }]
             }).columnFilter({
                 sPlaceHolder: "head:before",
                 aoColumns:[

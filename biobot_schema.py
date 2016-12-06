@@ -223,35 +223,16 @@ def get_schema(value, conf, biobot):
             }
         }
 
-        clap = {
-            'title': 'Clap',
+        gripper_groups = {
+            'title': 'Move',
+            'description': 'Move an object from a location to another one using the Gripper.',
             'type': 'object',
+            'id': 'id',
             'properties': {}
         }
 
-        gripper_groups = {
-            'title': 'Actions',
-            'type': 'array',
-            'format': 'tabs',
-            'items': {
-                'title': 'Action',
-                'type': 'object',
-                'headerTemplate': 'Action {{i}}',
-                'oneOf': [
-                    {
-                        'title': 'Clap',
-                        'properties': {
-                            'clap': {
-                                'title': 'Number of times to clap fingers',
-                                'type': 'integer',
-                                'minimum': 0,
-                                'default': 0,
-                            }
-                        }
-                    }
-                ]
-            }
-        }
+        for prop in [to_dict, from_dict]:
+            gripper_groups['properties'].update(prop)
 
         gripper = {
             'title': 'Gripper',

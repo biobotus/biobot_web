@@ -480,7 +480,7 @@ def log_picking(protocol, pick_num, step=None):
     return render_template('log_picking.html', active='BCA', protocol=protocol, \
                            steps=steps, current=step, colonies=current_colonies, \
                            colors=colors, db=db, pictures=pictures,
-                           characteristics=characteristics)
+                           characteristics=characteristics, pick_num=pick_num)
 
 @app.route('/logs/delete/<protocol>')
 @login_required

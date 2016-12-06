@@ -8,6 +8,10 @@
     </div>
 
     <h3>Raw protocol</h3>
+    <a href="data:text/json;charset=utf-8,{{json_protocol|urlencode}}" download="{{protocol}}.json">
+        <button class="btn btn-primary"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Save protocol</button>
+    </a>
+
     <p>{{json_protocol|nl2br}}</p>
 {% endblock content_main %}
 
