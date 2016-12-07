@@ -118,6 +118,7 @@ def get_schema(value, conf, biobot):
 
         transfer = {
             'title': 'Transfer',
+            'description': 'Transfer a volume of liquid from one location to another.',
             'type': 'object',
             'id': 'id',
             'properties': {}
@@ -129,6 +130,7 @@ def get_schema(value, conf, biobot):
 
         mix = {
             'title': 'Mix',
+            'description': 'Mix liquid in place by aspiring and dispensing a specific volume one or more times.',
             'type': 'object',
             'id': 'id',
             'properties': {}
@@ -140,6 +142,7 @@ def get_schema(value, conf, biobot):
 
         serial_dilution = {
             'title': 'Serial dilution',
+            'description': 'Perform a serial dilution by mixing and transferring liquids over multiple wells.',
             'type': 'object',
             'id': 'id',
             'properties': {}
@@ -151,6 +154,7 @@ def get_schema(value, conf, biobot):
 
         multi_dispense = {
             'title': 'Multi dispense',
+            'description': 'Dispense a specific volume of liquid over multiple wells.',
             'type': 'object',
             'id': 'id',
             'properties': {}
@@ -223,22 +227,42 @@ def get_schema(value, conf, biobot):
             }
         }
 
-        gripper_groups = {
+        move = {
             'title': 'Move',
-            'description': 'Move an object from a location to another one using the Gripper.',
+            'description': 'Move an object from a location to another.',
             'type': 'object',
             'id': 'id',
             'properties': {}
         }
 
-        for prop in [to_dict, from_dict]:
-            gripper_groups['properties'].update(prop)
+        move_properties = [from_dict, to_dict]
+        for prop in move_properties:
+            move['properties'].update(prop)
+
+        gripper_groups = {
+            'title': 'Actions',
+            'type': 'array',
+            'format': 'tabs',
+            'maxItems': conf.max_actions_per_group,
+            'items': {
+                'title': 'Action',
+                'type': 'object',
+                'oneOf': [
+                    {
+                        'title': 'Move',
+                        'properties': {
+                            'move': move
+                        },
+                    }
+                ]
+            }
+        }
 
         gripper = {
             'title': 'Gripper',
             'properties': {
                 'op': {
-                    'title': 'Gripper',
+                    'title': 'Tool',
                     'type': 'string',
                     'enum': ['gripper'],
                     'propertyOrder': 1
@@ -426,6 +450,7 @@ def get_schema(value, conf, biobot):
                 'oneOf': [
                     {
                         'title': 'Bacterial Colony Analysis',
+                        'description': 'Analyze a Petri dish to extract the characteristics of the bacterial colonies.',
                         'properties': {
                             'action': {
                                 'title': 'Action',
@@ -436,6 +461,7 @@ def get_schema(value, conf, biobot):
                     },
                     {
                         'title': 'Colony Picking',
+                        'description': 'Use one or more criterias to pick specific bacterial colonies and make them grow in another location.',
                         'properties': colony_picking
                     }
                 ]

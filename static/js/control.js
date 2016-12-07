@@ -316,9 +316,9 @@ function send_tac(action) {
         } else {
             var msg;
             if (params == 100)
-                msg = 'Place the transparent item (turbidity 100%) in the TAC and press \'Confirm\'.';
+                msg = 'Make sure the culture tube (turbidity 100%) is in the TAC and press \'Confirm\'.';
             else if (params == 0)
-                msg = 'Place the opaque item (turbidity 0%) in the TAC and press \'Confirm\'.';
+                msg = 'First of two calibration value received, press \'Confirm\' to complete the process.';
 
             BootstrapDialog.confirm({
                 title: 'TAC Calibration',
