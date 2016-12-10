@@ -1,9 +1,12 @@
+// JS file to connect to ROS
+
 var ros;
 var global_enable_topic;
 var step_done_topic;
 var error_topic;
 var ros_connection_error = false;
 
+// Display the current status of the robot at bottom center of the page
 function update_status(msg) {
     $('#biobot_status')[0].innerHTML = msg;
     if (msg.startsWith('powered off')) {
@@ -18,6 +21,7 @@ function update_status(msg) {
     }
 }
 
+// Create ROS object and connect to the rosbridge server via websocket
 function ros_init() {
     // Connecting to ROS
     ros = new ROSLIB.Ros();
@@ -61,9 +65,10 @@ function ros_init() {
 
     ros.connect('ws://' + ros_host + ':' + ros_port);
 
-    add_global_topic()
+    add_global_topic();
 }
 
+// Send emergency stop to the robot - this will kill ROS
 function e_stop_send() {
     BootstrapDialog.confirm({
         title: 'Emergency stop!',
@@ -88,6 +93,7 @@ function e_stop_send() {
     });
 }
 
+// Manually pause the robot at the Planner level (Manual Control actions will still go through)
 function pause(action) {
     var message = new ROSLIB.Message({
         data: action
@@ -96,6 +102,7 @@ function pause(action) {
     pause_topic.publish(message)
 }
 
+// ROS topics used in every page
 function add_global_topic() {
     global_enable_topic = new ROSLIB.Topic({
         ros: ros,

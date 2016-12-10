@@ -1,3 +1,5 @@
+// Control.js - used in Manual Control Tab
+
 var listener,
     new_step,
     new_step_rel,
@@ -23,6 +25,7 @@ var cur_pos_ids = ['cur_x_mm', 'cur_y_mm', 'cur_z0_mm',
     cur_g_wr_str = not_available,
     cur_g_op_str = not_available;
 
+// Display different sections based on tabs clicked in the top navigation bar
 function show(section) {
     visible_section = section;
     var sec;
@@ -50,6 +53,7 @@ function show(section) {
     }
 }
 
+// Change what is displayed when clicking on TAC show_* buttons
 function show_tac(section) {
     if (section == 'status') {
         $('.tac-status').show();
@@ -64,6 +68,7 @@ function show_tac(section) {
     }
 }
 
+// Change displayed text of dropdown menus
 function select(dropdown, option) {
     // Update JavaScript variable
     window[dropdown] = option;
@@ -72,6 +77,7 @@ function select(dropdown, option) {
     $('#'+dropdown).html(option+' <span class="caret"></span>');
 }
 
+// Send a move action to BioBot
 function move() {
     if (visible_section == 'axis') {
         // Move Axis
@@ -258,6 +264,7 @@ function move() {
     }
 }
 
+// Send information to TAC Module (config/calibration/start/stop)
 function send_tac(action) {
     var params;
 
@@ -357,6 +364,7 @@ function send_tac(action) {
     return;
 }
 
+// Callback function when a message is published on Tac1_To_Biobot ROS topic
 function receive_tac(message) {
     if (message['action'] == 'calibration_result') {
         if ('turb_0' in message) {
@@ -388,6 +396,7 @@ function receive_tac(message) {
     }
 }
 
+// Allow exporting TAC graph values (time, temperature and turbidity) to a CSV file
 function export_tac() {
     var csvContent = "data:text/csv;charset=utf-8,time,temperature,turbidity\n";
     data.forEach(function(d){
@@ -400,6 +409,7 @@ function export_tac() {
     link.click();
 }
 
+// Display TAC actual parameters or those who will become actual when it reaches its turbidity goal
 function toggle_params(time) {
     if (time == 'actual') {
         $('.tac-param').show();
@@ -410,6 +420,7 @@ function toggle_params(time) {
     }
 }
 
+// Send general messages to BioBot for simple actions
 function general(action) {
     if (action == 'reset_tips') {
         BootstrapDialog.confirm({
@@ -444,6 +455,7 @@ function general(action) {
     }
 }
 
+// Used to print a warning message, to prevent code duplication
 function print_warning(message) {
     BootstrapDialog.alert({
         title: 'Error',
@@ -478,16 +490,20 @@ window.onload = function() {
     });
 }
 
+// Unsubscribe from listened ROS topics when leaving the page
 window.onbeforeunload = function(){
-    listener.unsubscribe()
+    listener.unsubscribe();
+    listener_tac.unsubscribe();
 }
 
+// Update current position of the robot (UI only)
 function update_position() {
     cur_pos_ids.forEach(function(entry) {
         $('#'+entry)[0].innerHTML = window[entry+'_str'];
     });
 }
 
+// ROS topics configuration
 function add_topic() {
     new_step = new ROSLIB.Topic({
         ros : ros,
@@ -539,9 +555,9 @@ function add_topic() {
         name : '/Pixel_Size',
         messageType : 'std_msgs/Bool'
     });
-
 }
 
+// Homing function
 function home(axis) {
     var axis_list = [];
 
@@ -568,6 +584,7 @@ function home(axis) {
         home_gripper();
 }
 
+// Send homing to Gripper - different than others because it uses absolute values to move
 function home_gripper() {
     var step_dict = {'module_type': 'gripper', 'params': {'name': 'manip', 'args': {'wrist': 90, 'opening': 0}}}
 
@@ -578,6 +595,7 @@ function home_gripper() {
         new_step.publish(new_step_gripper);
 }
 
+// Update current robot location when refreshed values are recieved
 function new_position (data) {
     var mm = ' mm';
     var ul = ' µL';

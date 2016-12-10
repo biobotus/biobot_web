@@ -1,3 +1,5 @@
+// JavaScript file used in Protocol Editor page
+
 var p_name;
 var p_author;
 var p_description;
@@ -16,6 +18,7 @@ window.onload = function() {
     p_description = $('#protocol_description')[0];
 };
 
+// ROS topic related to this page
 function add_topic() {
     start_protocol_topic = new ROSLIB.Topic({
         ros: ros,
@@ -24,6 +27,8 @@ function add_topic() {
     });
 }
 
+// Export current page to a JSON string.
+// The refs variable is a boolean, to include the labware references or not.
 function get_json_protocol(refs){
     var prot = {};
     prot['name'] = p_name.value;
@@ -37,6 +42,7 @@ function get_json_protocol(refs){
     return JSON.stringify(prot);
 }
 
+// Ajax request performed to fetch the validated labware
 function get_labware_ajax() {
     var ret;
     $.ajax({
@@ -51,6 +57,7 @@ function get_labware_ajax() {
     return ret;
 }
 
+// JSON Editor configuration
 JSONEditor.defaults.options = {
     ajax: true,
     disable_array_delete_last_row: true,
@@ -62,6 +69,7 @@ JSONEditor.defaults.options = {
     theme: "bootstrap3"
 }
 
+// Save current protocol to a file
 function save_protocol() {
     var protocol = get_json_protocol(false);
 
@@ -74,6 +82,7 @@ function save_protocol() {
     saveAs(blob, filename);
 }
 
+// Load JSON protocol from file
 function open_protocol_file(e) {
     var file = e.target.files[0];
     if (!file || !file.name.endsWith('.json'))
@@ -103,7 +112,7 @@ instructions.on("ready",function() {
     $('.json-editor-btn-collapse').on("click", setHeightSidebar);
 });
 
-// Listen for changes
+// Listen for changes and make steps red if they contain errors
 instructions.on("change",  function() {
     setHeightSidebar();
     console.log(JSON.stringify(instructions.getValue()));
@@ -120,6 +129,7 @@ instructions.on("change",  function() {
     }
 });
 
+// Send the current protocol to the robot
 function start_protocol() {
     var errors_protocol = instructions.validate();
     var data = get_json_protocol(true);

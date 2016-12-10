@@ -1,3 +1,5 @@
+// Dialog confirmation message used when deleting labware items
+
 function delete_item(item) {
     BootstrapDialog.confirm({
         title: 'Delete item?',

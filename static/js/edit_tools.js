@@ -1,3 +1,4 @@
+// JSON Editor for the tools of the robot
 JSONEditor.defaults.options = {
     ajax: true,
     disable_array_delete_last_row: true,
@@ -9,6 +10,22 @@ JSONEditor.defaults.options = {
     theme: "bootstrap3"
 }
 
+var tools_holder = $("#tools_editor")[0];
+
+// Initialize the tools editor
+var tools_editor = new JSONEditor(tools_holder, {schema: {$ref: "/get/schema/tools"}});
+
+// Wait for editor to be ready (required because Ajax is used)
+tools_editor.on("ready",function() {
+    tools_editor.validate();
+    tools_editor.setValue(initial_tools);
+    $('.json-editor-btn-collapse').on("click", setHeightSidebar);
+});
+
+// Listen for changes
+tools_editor.on("change", setHeightSidebar);
+
+// Overwrite previous tools with current content
 function save_tools() {
     var errors = tools_editor.validate();
     if (errors.length == 0)
@@ -31,19 +48,4 @@ function save_tools() {
             type: BootstrapDialog.TYPE_DANGER
         });
 }
-
-var tools_holder = $("#tools_editor")[0];
-
-// Initialize the tools editor
-var tools_editor = new JSONEditor(tools_holder, {schema: {$ref: "/get/schema/tools"}});
-
-// Wait for editor to be ready (required because Ajax is used)
-tools_editor.on("ready",function() {
-    tools_editor.validate();
-    tools_editor.setValue(initial_tools);
-    $('.json-editor-btn-collapse').on("click", setHeightSidebar);
-});
-
-// Listen for changes
-tools_editor.on("change", setHeightSidebar);
 

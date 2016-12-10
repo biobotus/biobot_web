@@ -1,3 +1,4 @@
+// Used to dynamically resize images, in Home and Surveillance pages
 function autoResizeImg() {
     // Adjust height of webcam live stream
     var height = $(window).height();

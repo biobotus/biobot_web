@@ -167,6 +167,7 @@
 {% endblock content_left_top %}
 
 {% block content_right %}
+    {# Current platform location #}
     <div class="platform">
         <h3>Current Location</h3>
         <table class="table table-striped table-bordered">
@@ -211,6 +212,7 @@
         </table>
     </div>
     <div class="module" style="display:none">
+        {# TAC options and parameters #}
         <button type="button" class="btn btn-primary tac-graph" onclick="show_tac('status')">Show Status</button>
         <button type="button" class="btn btn-primary tac-status" onclick="show_tac('graph')">Show Graph</button>
         <button type="button" class="btn btn-info tac-param" onclick="toggle_params('post-goal')">Show post-goal parameters</button>

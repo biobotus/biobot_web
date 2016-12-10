@@ -1,4 +1,6 @@
-// TAC Graph
+// JavaScript file used in Manual Control tab to display TAC graphs (using D3)
+
+// Variables declaration
 var transition_time = 500,
     data = [],
     counter = 0,
@@ -22,12 +24,14 @@ var margin = {top: 25, bottom: 25, left: 25, right: 25},
     height = 200 - margin.top - margin.bottom,
     width = 600 - margin.left - margin.right;
 
+// Create a Date object from epoch time
 function UTC_Date(utc) {
     var d = new Date(0);
     d.setUTCSeconds(utc);
     return d;
 }
 
+// Create graphs upon first data reception
 function start() {
     x = d3.time.scale()
         .domain(d3.extent(data, function(d) {return d.date}))
@@ -175,6 +179,7 @@ function start() {
         .text("Current Turbidity (%)");
 }
 
+// Update graphs for every new value received
 function new_tac_value(time, temp, turb) {
     var new_data = {date: UTC_Date(time), temp: +temp, turb: +turb}
 

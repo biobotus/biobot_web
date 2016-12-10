@@ -1,3 +1,5 @@
+// JS file used in Deck Editor page
+
 var open_deck;
 
 window.onload = function() {
@@ -8,6 +10,7 @@ window.onload = function() {
     open_deck.addEventListener('change', open_deck_file, false);
 };
 
+// Configure JSON Editor
 JSONEditor.defaults.options = {
     ajax: true,
     disable_array_delete_last_row: true,
@@ -19,6 +22,7 @@ JSONEditor.defaults.options = {
     theme: "bootstrap3"
 }
 
+// Save deck to file
 function save_deck() {
     var items = JSON.stringify(deck.getValue());
 
@@ -29,6 +33,7 @@ function save_deck() {
     saveAs(blob, filename);
 }
 
+// Load deck file
 function open_deck_file(e) {
     var file = e.target.files[0];
     if (!file || !file.name.endsWith('.json'))
@@ -43,6 +48,7 @@ function open_deck_file(e) {
     this.value = null;
 }
 
+// Send Deck to database
 function send_deck() {
     var errors = deck.validate();
     if (errors.length == 0)
@@ -77,7 +83,7 @@ deck.on("ready",function() {
     $('.json-editor-btn-collapse').on("click", setHeightSidebar);
 });
 
-// Listen for changes
+// Listen for changes, highlight errors if any
 deck.on("change", function() {
     setHeightSidebar();
     var errors = deck.validate();

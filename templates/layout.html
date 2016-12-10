@@ -1,3 +1,5 @@
+{# Main BioBot layout page #}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -40,6 +42,7 @@
     </head>
 
     <body style="padding-bottom: 125px;">
+        {# Top of the page menu bar #}
         <nav class="navbar navbar-default no-margin">
         {# Brand and toggle get grouped for better mobile display #}
             <div class="navbar-header fixed-brand">
@@ -54,6 +57,7 @@
                     <li class="active"><button class="navbar-toggle collapse in" data-toggle="collapse" id="menu-toggle-2"> <span class="glyphicon glyphicon-th-large" aria-hidden="true"></span></button></li>
                 </ul>
 
+                {# Log in status #}
                 <div class="nav navbar-nav navbar-right container-fluid" style="padding-top:3px">
                     {% if not current_user.is_authenticated %}
                         <a href="{{'/login?next=' + request.path}}"><button type="button" class="btn btn-info navbar-btn active">
@@ -96,9 +100,12 @@
                     {# Footer #}
                     <nav id="footer" class="navbar navbar-default navbar-fixed-bottom">
                         <table style="width:100%"><tr>
+                            {# Emergency stop button #}
                             <td align=center style="width:150px; padding:5px">
                                 <button class="eStop" id="e-stop" type="button" onclick="e_stop_send()"></button>
                             </td>
+
+                            {# ROS Status #}
                             <td align=center style="width:150px; padding:5px"><h3>
                                 <p><span id="ros_status_label" class="label label-primary full-width"><img src="{{ url_for('static', filename='img/ros_logo_white.png') }}" alt="Logo ROS" height="28"></span></p>
                                 <p id="ros_label_connecting" style="display:inline"><span class="label label-default full-width">CONNECTING...</span></p>
@@ -106,11 +113,15 @@
                                 <p id="ros_label_error" style="display:none"><span class="label label-danger full-width">ERROR</span></p>
                                 <p id="ros_label_closed" style="display:none"><span class="label label-warning full-width">CLOSED</span></p>
                             </h3></td>
+
+                            {# BioBot Status #}
                             <td align=center style="padding:5px">
                                 <h3>BioBot is currently <span id='biobot_status'>...</span></h3>
                                 <p id="pause" style="display:none"><button class="btn btn-default" onclick="pause(true)">Pause</button></p>
                                 <p id="resume" style="display:none"><button class="btn btn-default" onclick="pause(false)">Resume</button></p>
                             </td>
+
+                            {# GitHub Link #}
                             <td align=center style="width:400px; padding:5px">
                                 <a href="https://github.com/biobotus" target="_blank" class="navbar-btn btn-lg btn-default btn"><img src="{{ url_for('static', filename='img/GitHub-Mark-32px.png') }}" alt="Logo GitHub"> BioBot Open Platform Project - 2016</a>
                             </td>

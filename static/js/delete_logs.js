@@ -1,3 +1,5 @@
+// Dialog confirmation message used when an admin deletes logs
+
 function delete_log(protocol) {
     BootstrapDialog.confirm({
         title: 'Delete log entry?',

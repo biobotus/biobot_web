@@ -22,6 +22,7 @@
         {% endif %}
     {% endwith %}
 
+    {# Show deck items whose origin is the deck editor #}
     {% if from_editor %}
         <h3>Labware to validate from deck editor</h3>
         <table id="table_from_editor" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
@@ -50,6 +51,7 @@
         </table>
     {% endif %}
 
+    {# Show deck items whose origin is the 3D cartography #}
     {% if from_carto %}
         <h3>Labware to validate from 3D cartography</h3>
         <table id="table_from_carto" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
@@ -78,6 +80,7 @@
         </table>
     {% endif %}
 
+    {# Show items with validated coordinates #}
     {% if validated %}
         <h3>Labware with validated location</h3>
         <table id="table_validated" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">

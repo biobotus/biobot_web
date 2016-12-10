@@ -1,3 +1,5 @@
+// Dialog confirmation windows used in ROS Status admin page, to start or kill ROS
+
 function start_ros(){
     BootstrapDialog.confirm({
         title: 'Start ROS?',
@@ -25,3 +27,4 @@ function stop_ros(){
         }
     });
 }
+

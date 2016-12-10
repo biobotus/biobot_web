@@ -14,6 +14,7 @@
     <button class="btn btn-primary btn-file"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Open protocol<input id="open-protocol" type="file" accept=".json"></button>
     <button onclick="start_protocol()" class="btn btn-primary"><span class="glyphicon glyphicon-send" aria-hidden="true"></span> Start protocol</button>
 
+    {# General protocol information input boxes #}
     <h3>Reference information</h3>
     <div class="input-group w75pc">
         <span class="input-group-addon w150px">Name</span>
@@ -27,6 +28,8 @@
         <span class="input-group-addon w150px">Description</span>
         <textarea id="protocol_description" class="form-control" style="resize:vertical;" cols="40" rows="3" maxlength="{{conf.limit_textarea_sm}}"></textarea>
     </div>
+
+    {# Show currently validated labware #}
     <div class="w75pc">
         <h3>Validated Labware</h3>
         <table id="table" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
@@ -46,6 +49,8 @@
             </tbody>
         </table>
     </div>
+
+    {# Instructions JSON Editor #}
     <div class="container-fluid row">
         <div id="instructions_holder"></div>
     </div>

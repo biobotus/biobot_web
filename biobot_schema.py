@@ -1,18 +1,22 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""This file contains the JSON Schemas used for the protocol editor."""
+"""This file contains the JSON Schemas used in the protocol and deck editors."""
 
 def get_schema(value, conf, biobot):
     schema = {}
 
     if value == 'labware':
+        # Get validated labware names and types only
         schema = list(biobot.deck.find({'validated': True}, {'name': 1, 'type': 1, '_id': 0}))
 
     elif value == 'instructions':
         generated = 'This is automatically generated from the previous two fields'
         pattern_description = 'Must be one or two uppercase letter followed by one or two digit'
 
+        # Tools dictionnaries are defined as separate variables to prevet code duplication
+
+        # Pipette Tools section
         from_dict = {
             'from_container': {
                 'title': 'From (container)',
@@ -124,6 +128,7 @@ def get_schema(value, conf, biobot):
             'properties': {}
         }
 
+        # Add pipette transfer properties
         transfer_properties = [from_dict, to_dict, volume_dict, aspirate_dict, dispense_dict]
         for prop in transfer_properties:
             transfer['properties'].update(prop)
@@ -136,6 +141,7 @@ def get_schema(value, conf, biobot):
             'properties': {}
         }
 
+        # Add pipette mix properties
         mix_properties = [from_dict, volume_dict, iteration_dict, aspirate_dict, dispense_dict]
         for prop in mix_properties:
             mix['properties'].update(prop)
@@ -148,6 +154,7 @@ def get_schema(value, conf, biobot):
             'properties': {}
         }
 
+        # Add pipette serial dilution properties
         serial_dilution_properties = [from_dict, to_dict, volume_dict, iteration_dict, mix_iteration_dict, aspirate_dict, dispense_dict]
         for prop in serial_dilution_properties:
             serial_dilution['properties'].update(prop)
@@ -160,6 +167,7 @@ def get_schema(value, conf, biobot):
             'properties': {}
         }
 
+        # Add pipette multi dispense properties
         multi_dispense_properties = [from_dict, to_dict, volume_dict, iteration_dict, aspirate_dict, dispense_dict]
         for prop in multi_dispense_properties:
             multi_dispense['properties'].update(prop)
@@ -227,6 +235,7 @@ def get_schema(value, conf, biobot):
             }
         }
 
+        # Gripper Tool section
         move = {
             'title': 'Move',
             'description': 'Move an object from a location to another.',
@@ -235,6 +244,7 @@ def get_schema(value, conf, biobot):
             'properties': {}
         }
 
+        # Add gripper move properties
         move_properties = [from_dict, to_dict]
         for prop in move_properties:
             move['properties'].update(prop)
@@ -271,6 +281,7 @@ def get_schema(value, conf, biobot):
             }
         }
 
+        # Petri Dish section
         picking_criterias = [
             {
                 'title': 'Color',
@@ -492,6 +503,7 @@ def get_schema(value, conf, biobot):
             }
         }
 
+        # Instructions JSON schema
         schema = {
             'title': 'Instructions',
             'type': 'array',
@@ -511,6 +523,7 @@ def get_schema(value, conf, biobot):
         }
 
     elif value == 'deck':
+        # Deck editor schema
         deck_cursor = biobot.labware.find({'class': {'$ne': 'Tool'}})
         deck = sorted([item['type'] for item in deck_cursor])
 
@@ -557,6 +570,7 @@ def get_schema(value, conf, biobot):
         }
 
     elif value == 'tools':
+        # Get Tools schema (from Manage Labware --> Edit tools)
         tools_cursor = biobot.labware.find({'class': 'Tool'})
         tools = sorted([item['type'] for item in tools_cursor])
         schema = {

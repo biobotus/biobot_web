@@ -1,7 +1,10 @@
+// JavaScript file used in deck item validation page
+
 var listener;
 var new_step;
 var new_step_rel;
 
+// Relative movements function (called from buttons)
 function move(axis, dist) {
     var args;
 
@@ -25,11 +28,13 @@ function move(axis, dist) {
     return;
 }
 
+// Safely move the robot to absolute coordinates, by making it always reach z = 0 first
 function move_abs(x, y, z) {
     move_abs_safe(x, y, 0);
     move_abs_safe(x, y, z);
 }
 
+// Send absolute coordinates to the robot
 function move_abs_safe(x, y, z) {
     var abs_dict = {'params': {'args': {'x': x, 'y': y, 'z': z}, 'name': 'pos'}, 'module_type': 'pipette_s'};
     console.log(JSON.stringify(abs_dict));
@@ -51,6 +56,7 @@ window.onbeforeunload = function(){
     listener.unsubscribe()
 }
 
+// ROS topics related to the current page
 function add_topic() {
     new_step_rel = new ROSLIB.Topic({
         ros : ros,
@@ -76,6 +82,7 @@ function add_topic() {
     });
 }
 
+// Update current coordinates when a new position is received
 function new_position (data) {
     $('#valid_x')[0].value = data[0].toFixed(3);
     $('#valid_y')[0].value = data[1].toFixed(3);

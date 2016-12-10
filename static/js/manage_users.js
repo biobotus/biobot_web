@@ -1,3 +1,5 @@
+// Dialog confirmation messages when performing actions on user accounts
+
 function activate_user(user) {
     BootstrapDialog.confirm({
         title: 'Activate user?',

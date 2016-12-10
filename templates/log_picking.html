@@ -3,6 +3,7 @@
 {% block content_left %}
     {{super()}}
 
+    {# Display picking criterias #}
     <div style="margin-top:15px;margin-right:15px">
         <table class="table table-bordered">
             <tr><th colspan=2>Desired colony characteristics of {{characteristics['pick_num']}}</th></tr>
@@ -68,6 +69,7 @@
                 }]
             }).columnFilter({
                 sPlaceHolder: "head:before",
+                {# Allow filtering on colors and select status #}
                 aoColumns:[
                     null,
                     {type: "select", values: {{colors|safe}}},

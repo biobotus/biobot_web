@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import ast
 import base64
 from bson import ObjectId
 import datetime
@@ -37,6 +36,7 @@ def check_password(hashed_password, user_password):
     return password == hashlib.sha256(salt.encode() + user_password.encode()).hexdigest()
 
 def admin_required(func):
+    """Function wrapper to allow only logged in admins to access the page."""
     @wraps(func)
     def decorated_function(*args, **kwargs):
         if not current_user.is_admin():
@@ -45,6 +45,7 @@ def admin_required(func):
     return decorated_function
 
 def valid_protocol(protocol):
+    """Verify if the requested biological protocol exists."""
     if protocol in client.database_names() and protocol.startswith('protocol'):
         return True
     else:
@@ -53,6 +54,7 @@ def valid_protocol(protocol):
 
 # Color functions used for BCA
 def closest_color(requested_color):
+    """Find the closest color name from an 8 bits RGB tuple."""
     min_colors = {}
     for key, name in webcolors.css21_hex_to_names.items():
         r_c, g_c, b_c = webcolors.hex_to_rgb(key)
@@ -63,13 +65,14 @@ def closest_color(requested_color):
     return min_colors[min(min_colors.keys())]
 
 def get_color_name(requested_color):
+    """Get the exact or closest color name of an 8 bit RGB tuple."""
     try:
         color_name = webcolors.rgb_to_name(requested_color)
     except ValueError:
         color_name = closest_color(requested_color)
     return color_name
 
-# Load default configuration
+# Load default configuration from local file
 with open('config.json') as config:
     conf = argparse.Namespace(**json.load(config))
 
@@ -109,7 +112,7 @@ except pymongo.errors.ServerSelectionTimeoutError:
 
 # Create Flask Application
 app = Flask(__name__)
-app.secret_key = uuid.uuid4().hex
+app.secret_key = uuid.uuid4().hex  # Required to use log in and session manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -118,6 +121,7 @@ ros_pid = None
 
 # User class
 class User(UserMixin):
+    """User Class making DB-stored parameters accessible from HTML templates."""
     def __init__(self, username):
         self.username = username
         user = biobot.credentials.find_one({'username': username})
@@ -146,20 +150,21 @@ def go_home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        next = request.args.get('next')
+        next_page = request.args.get('next')
         username = request.form['username']
         password = request.form['password']
         user = biobot.credentials.find_one({'username': username})
         if user and check_password(user['password'], password):
-            if user['active']:
+            if user['active']:  # Inactived users should not be able to log in
                 login_user(User(username))
                 biobot.credentials.update_one(user, {'$set':
                                               {'last_login' : time.time()}})
 
+                # If an admin logs in and there is at least one inactived user, show it
                 if user['admin'] and biobot.credentials.find_one({'active': False}):
                     flash('At least one user account has to be activated', 'info')
                     return redirect(url_for('manage_users'))
-                return redirect(next or url_for('home'))
+                return redirect(next_page or url_for('home'))
             else:
                 flash('Account not yet activated by an administrator', 'warning')
         else:
@@ -192,18 +197,29 @@ def create_account():
             return render_template('create_account.html')
 
         if not username.replace('_', '').isalnum():
+            # Only allow letters, numbers and underscore characters in usernames
             flash('Invalid username (letters, numbers and underscores only)', 'danger')
             return render_template('create_account.html')
 
         user = biobot.credentials.find_one({'username': username})
-        if user or not username:
+        if user or not username:  # Check if username is not empty or already taken
             flash('Username not available', 'danger')
             return render_template('create_account.html')
 
+        active = False
+        admin = False
+
+        # If this is the first user to register, make it active and admin
+        if not biobot.credentials.find_one():
+            active = True
+            admin = True
+            flash('First account created, activated and is administrator, congratulations!', 'success')
+
+        # Create a new user account
         biobot.credentials.insert_one({'username': username,
                                      'password': hash_password(password),
-                                     'active': False,
-                                     'admin': False})
+                                     'active': active,
+                                     'admin': admin})
         flash('Account created successfully', 'success')
         return redirect(url_for('login'))
 
@@ -223,6 +239,7 @@ def change_password():
                 flash('Password cannot be empty', 'danger')
                 return render_template('change_password.html')
 
+            # Modify password
             biobot.credentials.update_one(user, {'$set': {
                                           'password': hash_password(new_password)}})
             flash('Password changed successfully', 'success')
@@ -236,6 +253,7 @@ def change_password():
         return render_template('change_password.html')
 
 def ros_thread():
+    """Run shell command defined as 'roslaunch' in config file to start ROS."""
     global ros_pid
     try:
         popen = subprocess.Popen(conf.roslaunch.split())
@@ -295,9 +313,10 @@ def deck_editor():
 @app.route('/deck_editor/send/<b64_deck>')
 @login_required
 def receive_deck(b64_deck):
-    deck = ast.literal_eval(base64.b64decode(b64_deck).decode('utf-8'))
-    if deck:
+    deck = json.loads(base64.b64decode(b64_deck).decode('utf-8'))
+    if deck:  # Prevent empty list that would make insert_many crash
         for i in range(len(deck)):
+            # Add extra tags used by application
             deck[i]['source'] = 'deck_editor'
             deck[i]['uuid'] = uuid.uuid4().hex
             deck[i]['validated'] = False
@@ -327,6 +346,7 @@ def mapping_delete(uid):
     item = biobot.deck.find_one({'uuid': uid})
     if item:
         if item['source'] == '3d_cartography':
+            # Picture of items coming from 3D cartography has to be deleted
             fs.delete(item['image_id'])
         biobot.deck.delete_one(item)
     return redirect(url_for('mapping'))
@@ -342,12 +362,15 @@ def mapping_modify(uid):
 def mapping_validate(uid):
     if request.method == 'GET':
         item = biobot.deck.find_one({'uuid': uid})
+
+        # Get a list of not tools labware options for item type dropdown menu
         deck_cursor = biobot.labware.find({'class': {'$ne': 'Tool'}})
         deck = sorted([item['type'] for item in deck_cursor])
         options = "<option value={0}>{1}</option>"
         all_options = [options.format(i, i.replace('_', ' ').title()) for i in deck]
         labware_options = Markup(''.join(all_options))
 
+        # Get items' approximate coordinates
         if item['source'] == 'deck_editor':
             ini = {'x': round(conf.deck_length/100*int(item['col'])+conf.deck_length/200, 3),
                    'y': round(conf.deck_width/26*(ord(item['row'])-65)+conf.deck_width/52, 3)}
@@ -361,17 +384,22 @@ def mapping_validate(uid):
     else:
         if request.form['valid_x'] != '' and request.form['valid_y'] != '' and \
                                              request.form['valid_z'] != '':
-            biobot.deck.update_one({'uuid': uid},
-                                   {'$set': {'type': request.form['type'],
-                                             'name': request.form['name'],
-                                             'valid_x': float(request.form['valid_x']),
-                                             'valid_y': float(request.form['valid_y']),
-                                             'valid_z': float(request.form['valid_z']),
-                                             'validated': True}})
-            return redirect(url_for('mapping'))
+            try:
+                biobot.deck.update_one({'uuid': uid},
+                                       {'$set': {'type': request.form['type'],
+                                                 'name': request.form['name'],
+                                                 'valid_x': float(request.form['valid_x']),
+                                                 'valid_y': float(request.form['valid_y']),
+                                                 'valid_z': float(request.form['valid_z']),
+                                                 'validated': True}})
+                return redirect(url_for('mapping'))
+            except ValueError:
+                # Could happen if manually entered value is not a float
+                # The manual coordinate entry is only available to admins
+                flash('Coordinates must be floating point numbers only.', 'danger')
         else:
             flash('Cannot validate item with empty coordinates', 'danger')
-            return redirect(request.url)
+        return redirect(request.url)
 
 @app.route('/logs')
 def logs():
@@ -383,12 +411,14 @@ def log_highlights(protocol):
     if not valid_protocol(protocol):
         return redirect(url_for('logs'))
 
+    # Get database of current protocol
     db = client[protocol]
     started = db.steps.count()
     done = db.steps.count({'end': {'$exists': True}})
     info = db.protocol.find_one()
     json_protocol = {}
     if info:
+        # Pretty print the raw protocol
         json_protocol = json.dumps(info['protocol'], indent=4, sort_keys=True)
 
     return render_template('log_highlights.html', active='Highlights', \
@@ -402,7 +432,8 @@ def log_steps(protocol):
 
     db = client[protocol]
     steps = list(db.steps.find())
-    return render_template('log_steps.html', active='Steps', protocol=protocol, steps=steps, db=db)
+    return render_template('log_steps.html', active='Steps', protocol=protocol, \
+                           steps=steps, db=db)
 
 @app.route('/logs/<protocol>/bca')
 @app.route('/logs/<protocol>/bca/step/<int:step>')
@@ -420,14 +451,21 @@ def log_bca(protocol, step=None):
     df = pd.DataFrame(colonies)
     steps = sorted(df.step.unique())
     if step is None:
+        # If no step is entered, return first
+        # step for which there was an analysis in the protocol
         return redirect("{0}/step/{1}".format(request.url, steps[0]))
 
     current_colonies = list(db.colonies.find({'step': step, 'operation': 'analysis'}))
+
+    # Add closest color names and retrieve list of unique colors
     df = pd.DataFrame(current_colonies)
     df['color_text'] = df.color.apply(webcolors.hex_to_rgb).apply(get_color_name)
     colors = list(df.color_text.unique())
+
+    # Convert back DataFrame to list of dictionnaries
     current_colonies = [x.to_dict() for _, x in df.iterrows()]
 
+    # Information about pictures to display in the page
     pictures = [{
                     'title': 'Raw',
                     'description': 'Raw picture of the Petri dish',
@@ -457,16 +495,24 @@ def log_picking(protocol, pick_num, step=None):
 
     steps = sorted(pd.DataFrame(colonies).step.unique())
     if step is None:
+        # If no step is entered, return first
+        # step for which there was an analysis in the protocol
         return redirect("{0}/step/{1}".format(request.url, steps[0]))
 
     current_colonies = list(db.colonies.find({'step': step, 'operation': pick_num}))
+
+    # Add closest color names and retrieve list of unique colors
     df = pd.DataFrame(current_colonies)
     df['color_text'] = df.color.apply(webcolors.hex_to_rgb).apply(get_color_name)
     colors = list(df.color_text.unique())
+
+    # Convert back DataFrame to list of dictionnaries
     current_colonies = [x.to_dict() for _, x in df.iterrows()]
 
+    # Get picking criterias
     characteristics = db.picking.find_one({'step': step, 'pick_num': pick_num})
 
+    # Information about pictures to display in the page
     pictures = [{
                     'title': 'Raw',
                     'description': 'Raw picture of the Petri dish',
@@ -490,12 +536,14 @@ def delete_logs(protocol):
         flash("Cannot delete unexisting protocol {0}".format(protocol), 'danger')
         return redirect(url_for('logs'))
 
+    # Delete all data from current protocol
     biobot.stats.delete_one({'id': protocol})
     images = list(biobot.bca_images.find({'protocol': 'protocol'}))
     for img in images:
         fs.delete(img['image_id'])
     biobot.bca_images.delete_many({'protocol': protocol})
     client.drop_database(protocol)
+
     flash("Entry {0} deleted successfully".format(protocol), 'info')
     return redirect(url_for('logs'))
 
@@ -510,6 +558,7 @@ def manage_users():
 @login_required
 @admin_required
 def activate_user(username):
+    """Activate a user account."""
     user = biobot.credentials.find_one({'username': username})
     if not user['active']:
         biobot.credentials.update_one(user, {'$set': {'active': True}})
@@ -523,6 +572,7 @@ def activate_user(username):
 @login_required
 @admin_required
 def demote_user(username):
+    """Remove admin privileges of another administrator."""
     user = biobot.credentials.find_one({'username': username})
     if current_user.get_id() == username:
         flash('Cannot revert yourself to standard user', 'danger')
@@ -541,6 +591,7 @@ def demote_user(username):
 @login_required
 @admin_required
 def promote_user(username):
+    """Give admin privileges from a normal user."""
     user = biobot.credentials.find_one({'username': username})
     if user:
         if user['admin']:
@@ -557,6 +608,7 @@ def promote_user(username):
 @login_required
 @admin_required
 def delete_user(username):
+    """Delete a user account that is not yours."""
     user = biobot.credentials.find_one({'username': username})
     if current_user.get_id() == username:
         flash('Cannot delete yourself', 'danger')
@@ -573,6 +625,7 @@ def delete_user(username):
 @admin_required
 def manage_labware():
     if request.method == 'POST':
+        # Add a new labware entry
         item_type = request.form['type'].lower().strip().replace(' ', '_')
         description = request.form['description']
         item_class = request.form['class']
@@ -605,21 +658,27 @@ def delete_labware(item_type):
 @login_required
 @admin_required
 def edit_tools():
-    with open('tools_conf.json', 'r') as f:
-        tools = json.load(f)
+    # Get tools physical configuration from its config file
+    try:
+        with open('tools_conf.json', 'r') as f:
+            tools = json.load(f)
+    except EnvironmentError:
+        tools = []
     return render_template('edit_tools.html', tools=Markup(tools))
 
 @app.route('/manage_labware/edit_tools/save/<b64_tools>')
 @login_required
 @admin_required
 def save_tools(b64_tools):
-    tools = ast.literal_eval(base64.b64decode(b64_tools).decode('utf-8'))
+    # Overwite tools config file with new tools data
+    tools = json.loads(base64.b64decode(b64_tools).decode('utf-8'))
     with open('tools_conf.json', 'w') as f:
         json.dump(tools, f)
     return redirect(url_for('edit_tools'))
 
 @app.route('/bad_permissions')
 def bad_permissions():
+    """Function called if a normal user tries to get to an admin reserved page."""
     return render_template('bad_permissions.html')
 
 @app.route('/get/schema/<value>')
@@ -634,13 +693,14 @@ def get_schema(value):
 
 @app.errorhandler(404)
 def page_not_found(error):
-    """This method handles all unexisting route requests"""
+    """This method handles all unexisting route requests."""
     return render_template('404.html'), 404
 
 # Add objects that can be called from the Jinja2 HTML templates
 @app.template_filter()
 @evalcontextfilter
 def nl2br(eval_ctx, value):
+    """Converts new lines to paragraph breaks in HTML."""
     _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
     result = '\n\n'.join('<p>%s</p>' % p.replace('\n', '<br>\n') \
         for p in _paragraph_re.split(escape(value)))
@@ -669,6 +729,7 @@ def format_sidebar(name, icon, url):
     return Markup(html)
 
 def get_item_picture(filename, tags=""):
+    """Return the picture of the requested deck item. (filenames are uid.jpg)"""
     image = biobot.deck.find_one({'filename': filename})
     if image:
         image_id = image['image_id']
@@ -681,6 +742,7 @@ def get_item_picture(filename, tags=""):
     return Markup(html)
 
 def get_bca_picture(filename, protocol, step, tags=""):
+    """Return the picture of the requested BCA picture, with click download and optional tags."""
     image = biobot.bca_images.find_one({'protocol': protocol, 'step': step, 'filename': filename})
     if image:
         image_id = image['image_id']
@@ -693,6 +755,7 @@ def get_bca_picture(filename, protocol, step, tags=""):
 
     return Markup(html)
 
+# Make some variables and functions available from Jinja2 HTML templates
 app.jinja_env.globals.update(conf=conf,
                              force_type = Markup('onselect="return false" ' \
                                           'onpaste="return false" ' \

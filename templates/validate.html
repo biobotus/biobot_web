@@ -40,6 +40,7 @@
             </tr>
         </thead>
         <tbody>
+            {# Item attributes are parts of the form #}
             <tr><form method="post">
                 {% if item['source'] == '3d_cartography' %}
                     <td>{{get_item_picture("{}.jpg".format(item['uuid']), tags='class="deck_img"')}}</td>
@@ -67,6 +68,7 @@
         </tbody>
     </table>
 
+    {# Generate relative movement buttons #}
     <h3>Relative movements</h3>
     {% for i in [('X', 'primary'), ('Y', 'default'), ('Z', 'primary')] %}
         <div>
@@ -77,6 +79,7 @@
         </div>
     {% endfor %}
 
+    {# Absolute movement button(s) #}
     <h3>Absolute movements</h3>
     <div><button class="btn btn-default navbar-btn" onclick="move_abs({{ini['x']}}, {{ini['y']}}, 0)" style="text-align:left">
         Approximated location<br>

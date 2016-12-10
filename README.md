@@ -7,7 +7,8 @@ The BioBot Web Application is used by scientists to operate the robot. It combin
 - [DataTables] to improve the display of various data,
 - [MongoDB] as the database,
 - [MJPG-Streamer] to enable live-streaming a video of the robot from its webcam,
-- [JSON Editor] to graphically create biological protocol files following the [Autoprotocol] open standard.
+- [JSON Editor] to graphically create biological protocol files following the [Autoprotocol] open standard,
+- [D3], to create graphs to display realtime TAC values.
 
 ![BioBot Home Page](/static/img/home_page.png "BioBot Home Page")
 
@@ -35,13 +36,14 @@ optional arguments:
 | ---- | ----------- |
 | Login | Log in to the web application. Creating account and changing password features are implemented. |
 | Surveillance | Display live stream video of the robot, which comes from the webcam. |
-| Manual Control* | Manually control BioBot : Axis, Single Pipette, Multiple Pipette and Gripper. The current position of the robot refreshes automatically after every step. |
+| Manual Control* | Manually control BioBot : Axis, Single Pipette, Multiple Pipette, Gripper, TAC Module and General settings. The current position of the robot refreshes automatically after every step. |
 | Mapping* | Visualize labware on the platform and validate its location using the single-channel pipette's tip as reference. Validated items can be used by the robot for the execution of protocols. |
 | Biological Protocol* | Graphically create and modify biological protocols. They can be saved for later, loaded whenever and executed on the platform. |
 | Deck Editor* | Manually tell the BioBot the approximate location of items on the deck of the platform. Deck description files can be saved and loaded at any time. This is the manual equivalent of the 3D cartography. |
 | Logs | View details and results about every executed biological protocols. The informations contain a description of every step, including start and stop timestamps, as well as bacterial colony analysis, if any. Only administrators can delete protocol logs. |
 | Manage Users** | View all users, last login time and admin status. Can change admin status of users and delete them. |
 | Manage Labware** | View, add and remove labware items, used in the Protocol Editor's labware section as well as in the item validation feature of the Mapping tab. |
+| ROS Status** | Start or kill ROS (All scripts used to operate the robot). |
 &ast; Requires login  
 &ast;&ast;Requires administrator rights
 
@@ -54,4 +56,5 @@ optional arguments:
 [MJPG-Streamer]: <https://sourceforge.net/projects/mjpg-streamer>
 [JSON Editor]: <https://github.com/jdorn/json-editor>
 [Autoprotocol]: <http://autoprotocol.org/>
+[D3]: <https://d3js.org/>
 

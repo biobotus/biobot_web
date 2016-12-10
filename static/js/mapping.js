@@ -1,7 +1,11 @@
+// JS file used in Mapping page
+
+// Redirect to validation page of current item, used to hide URL of button
 function validate_item(uuid) {
     window.location.assign(window.location.href + '/validate/' + uuid)
 }
 
+// Confirmation dialog to delete an item
 function delete_item(item, uuid) {
     BootstrapDialog.confirm({
         title: 'Delete item?',
@@ -15,6 +19,7 @@ function delete_item(item, uuid) {
     });
 }
 
+// Confirmation dialog to unvalidate a validated item
 function modify_item(item, uuid) {
     BootstrapDialog.confirm({
         title: 'Modify item?',
@@ -28,6 +33,7 @@ function modify_item(item, uuid) {
     });
 }
 
+// Confirmation dialog to start 3D cartography process
 function start_3d_cartography() {
     BootstrapDialog.confirm({
         title: 'Start 3D Cartography?',
@@ -46,6 +52,7 @@ function start_3d_cartography() {
     });
 }
 
+// ROS topic specific to Mapping page
 function add_topic() {
     start_mapping = new ROSLIB.Topic({
         ros: ros,
@@ -59,3 +66,4 @@ window.onload = function() {
     ros_init();
     add_topic();
 }
+

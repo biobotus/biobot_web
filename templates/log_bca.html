@@ -32,6 +32,7 @@
     <script>
         $(document).ready(function() {
             var table = $('#table').dataTable({
+                {# Change default dataTable dom to add Excel button in the row before the table #}
                 dom: '<"row"<"col-sm-4"l><"col-sm-4"B><"col-sm-4"f>><"row"<"col-sm-12"tr>><"row"<"col-sm-5"i><"col-sm-7"p>>',
                 "lengthMenu": [[5, 25, 100, -1], [5, 25, 100, "All"]],
                 buttons: [{

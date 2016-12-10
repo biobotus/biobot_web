@@ -14,6 +14,7 @@
                 <td valign="top">
                     <div class="container-fluid row" style="min-width:200px">
                         {% block content_left %}
+                            {# Dropdown menu with steps #}
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Step {{current}} <span class="caret"></span>
@@ -32,6 +33,7 @@
                     </div>
                 </td>
                 <td valign="top">
+                    {# Pictures carousel to show raw and analyzed Petri dish pictures #}
                     <div class="container-fluid row">
                         <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
                             <!-- Indicators -->
