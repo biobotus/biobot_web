@@ -260,7 +260,7 @@ def ros_thread():
         ros_pid = popen.pid
         return_code = popen.wait()
         if return_code:
-            print("subprocess.CalledProcessError: Command '{0}' returned non-zero exit status {1}".format(cmd, return_code))
+            print("subprocess.CalledProcessError: Command '{0}' returned non-zero exit status {1}".format(conf.roslaunch, return_code))
     finally:
         ros_pid = None
 
@@ -746,13 +746,19 @@ def get_bca_picture(filename, protocol, step, tags=""):
     image = biobot.bca_images.find_one({'protocol': protocol, 'step': step, 'filename': filename})
     if image:
         image_id = image['image_id']
-        img = fs.get(image_id).read()
-        b64data = base64.b64encode(img).decode('utf-8')
-        img_html = '<img src="data:image/jpeg;base64,{0}" {1}>'.format(b64data, tags)
-        html = '<a href="data:image/jpeg;base64,{0}" download="{1}">{2}</a>'.format(b64data, filename, img_html)
-    else:
-        html = '<img alt="Image {0} not found" {1}>'.format(filename, tags)
+        try:
+            img = fs.get(image_id).read()
+            b64data = base64.b64encode(img).decode('utf-8')
+            img_html = '<img src="data:image/jpeg;base64,{0}" {1}>'.format(b64data, tags)
+            html = '<a href="data:image/jpeg;base64,{0}" download="{1}">{2}</a>'.format(b64data, filename, img_html)
+            return Markup(html)
 
+        except:
+            pass
+    else:
+        pass
+
+    html = '<img alt="Image {0} not found" {1}>'.format(filename, tags)
     return Markup(html)
 
 # Make some variables and functions available from Jinja2 HTML templates

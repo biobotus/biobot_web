@@ -3,7 +3,7 @@
 {% block content_main %}
     <div class="progress">
       <div class="progress-bar progress-bar-striped active" role="progressbar" style="min-width:8em;width: {{100*done/started}}%;">
-        <strong>{{"{0}/{1} steps done ({2}%)".format(done, started, 100*done/started)}}</strong>
+        <strong>{{"{0}/{1} steps done ({2:.2f}%)".format(done, started, 100*done/started)}}</strong>
       </div>
     </div>
 
