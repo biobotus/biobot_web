@@ -10,6 +10,8 @@ The BioBot Web Application is used by scientists to operate the robot. It combin
 - [JSON Editor] to graphically create biological protocol files following the [Autoprotocol] open standard,
 - [D3], to create graphs to display realtime TAC values.
 
+The development guide for the web application is a OneNote document located in the 'doc' folder.
+
 ![BioBot Home Page](/static/img/home_page.png "BioBot Home Page")
 
 To start, run this command from the `biobot_web` repository on the Jetson TK1: `$ ./start_web.sh`. Then, from any browser on the network, navigate to URL `<Jetson TK1's IP address>:5000`. Here are the complete usage options:
